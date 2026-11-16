@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Học Quản lý dự án CNTT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: thanh trên cố định · mục lục khóa học bên trái · cột đọc ở giữa (~760px) · "Trong bài này" bên phải.
+   Màn ≥1280px: 3 cột · 1024–1279px: 2 cột (ẩn cột phải) · <1024px: mục lục thành ngăn kéo. */
+:root {
+  --paper: #f5f6f8;
+  --surface: #ffffff;
+  --sunken: #eef0f4;
+  --ink: #121826;
+  --muted: #5b6474;
+  --line: #e2e5eb;
+  --accent: #2f4fd8;
+  --accent-ink: #ffffff;
+  --accent-soft: #eef1fd;
+  --marker: #b45309;
+  --marker-soft: #fdf3e4;
+  --good: #15803d;
+  --good-soft: #e6f4ea;
+  --good-ink: #ffffff;
+  --bad: #c0262d;
+  --bad-soft: #fdecec;
+  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06);
+  --font-body: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --top-h: 60px;
+  --side-w: 296px;
+  --rail-w: 252px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1117; --surface: #151b24; --sunken: #10151d; --ink: #e6e9ef; --muted: #98a2b3; --line: #252d39;
+    --accent: #8fa3ff; --accent-ink: #0d1117; --accent-soft: #1b2340; --marker: #f2a65a; --marker-soft: #33240f;
+    --good: #6dd28f; --good-soft: #14291c; --good-ink: #0d1117; --bad: #ff8a8a; --bad-soft: #3a1a1c;
+    --shadow: 0 1px 2px rgba(0,0,0,.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1117; --surface: #151b24; --sunken: #10151d; --ink: #e6e9ef; --muted: #98a2b3; --line: #252d39;
+  --accent: #8fa3ff; --accent-ink: #0d1117; --accent-soft: #1b2340; --marker: #f2a65a; --marker-soft: #33240f;
+  --good: #6dd28f; --good-soft: #14291c; --good-ink: #0d1117; --bad: #ff8a8a; --bad-soft: #3a1a1c;
+  --shadow: 0 1px 2px rgba(0,0,0,.4);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+html { scroll-padding-top: calc(var(--top-h) + 16px); }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.25; margin: 0; letter-spacing: -.01em; }
+h1 { font-size: 2.1rem; font-weight: 800; }
+h2 { font-size: 1.4rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: .4rem; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+svg.i { width: 18px; height: 18px; flex: none; }
+
+/* ---------- Khung ứng dụng ---------- */
+.shell { display: grid; grid-template-columns: var(--side-w) minmax(0,1fr) var(--rail-w); grid-template-rows: var(--top-h) 1fr; grid-template-areas: "top top top" "side main rail"; min-height: 100vh; }
+.topbar { grid-area: top; position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 12px; padding: 0 16px; height: var(--top-h); background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--line); }
+.iconbtn { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; border: 1px solid transparent; background: transparent; cursor: pointer; color: var(--muted); }
+.iconbtn:hover { background: var(--sunken); color: var(--ink); }
+.iconbtn[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.top-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.logo { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--font-mono); font-size: .72rem; font-weight: 700; flex: none; text-decoration: none; }
+.crumbs { display: flex; align-items: center; gap: 6px; font-size: .88rem; color: var(--muted); min-width: 0; white-space: nowrap; overflow: hidden; }
+.crumbs a { color: var(--muted); text-decoration: none; }
+.crumbs a:hover { color: var(--ink); }
+.crumbs b { color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+.crumbs .sep { opacity: .5; }
+.top-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.cprog { display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--muted); padding: 4px 10px 4px 4px; border-radius: 99px; background: var(--sunken); margin-right: 4px; white-space: nowrap; }
+.ring { --p: 0; width: 26px; height: 26px; border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; }
+.ring::after { content: ""; width: 18px; height: 18px; border-radius: 50%; background: var(--sunken); }
+.cprog b { color: var(--ink); font-family: var(--font-mono); }
+#account-top:empty { display: none; }
+#account-top .pf-btn { white-space: nowrap; padding: 7px 14px; }
+#account-top .pf-chip span:first-child { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- Mục lục trái ---------- */
+.sidebar { grid-area: side; position: sticky; top: var(--top-h); height: calc(100vh - var(--top-h)); overflow-y: auto; background: var(--surface); border-right: 1px solid var(--line); padding: 18px 12px 28px; display: grid; gap: 18px; align-content: start; scrollbar-width: thin; }
+.course-card { padding: 4px 8px 2px; display: grid; gap: 8px; }
+.course-card .t { font-weight: 800; font-size: 1.02rem; line-height: 1.3; }
+.course-card .s { font-size: .8rem; color: var(--muted); }
+.bar { height: 6px; background: var(--sunken); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); width: 0; border-radius: 99px; transition: width .3s; }
+.nvgroup { display: grid; gap: 1px; }
+.nvlabel { font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); padding: 0 10px 6px; font-weight: 700; }
+.nv { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); padding: 7px 10px; border-radius: 8px; font-size: .9rem; line-height: 1.35; }
+.nv:hover { background: var(--sunken); }
+.nv.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.nv .tag { margin-left: auto; font-family: var(--font-mono); font-size: .7rem; color: var(--muted); }
+.nv.active .tag { color: var(--accent); }
+.mod { border-radius: 10px; }
+.mod-head { width: 100%; display: grid; grid-template-columns: 30px 1fr auto; gap: 8px; align-items: center; text-align: left; background: none; border: 0; padding: 8px 10px; border-radius: 8px; cursor: pointer; }
+.mod-head:hover { background: var(--sunken); }
+.mod-code { font-family: var(--font-mono); font-size: .74rem; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 3px 0; text-align: center; }
+.mod-name { font-size: .9rem; font-weight: 600; line-height: 1.3; }
+.mod-meta { font-size: .72rem; color: var(--muted); font-family: var(--font-mono); display: flex; align-items: center; gap: 6px; }
+.chev { transition: transform .2s; color: var(--muted); }
+.mod.open .chev { transform: rotate(90deg); }
+.mod-body { display: none; padding: 2px 0 6px 14px; margin-left: 14px; border-left: 1px solid var(--line); }
+.mod.open .mod-body { display: grid; gap: 1px; }
+.ses { display: grid; grid-template-columns: 20px 1fr; gap: 8px; align-items: start; text-decoration: none; color: var(--ink); padding: 6px 8px; border-radius: 8px; font-size: .84rem; line-height: 1.4; }
+.ses:hover { background: var(--sunken); }
+.ses .dot { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line); display: grid; place-items: center; margin-top: 1px; font-size: .62rem; font-family: var(--font-mono); color: var(--muted); background: var(--surface); }
+.ses.done .dot { background: var(--good); border-color: var(--good); color: var(--good-ink); }
+.ses.cur { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.ses.cur .dot { border-color: var(--accent); color: var(--accent); }
+.ses.done.cur .dot { background: var(--good); color: var(--good-ink); border-color: var(--good); }
+.ses.ov { color: var(--muted); font-size: .8rem; }
+
+/* ---------- Cột nội dung ---------- */
+main { grid-area: main; min-width: 0; padding: 36px clamp(20px, 4vw, 56px) 80px; }
+main > * { width: 100%; max-width: 780px; margin-left: auto; margin-right: auto; }
+main:focus { outline: none; }
+main { display: grid; gap: 30px; align-content: start; }
+.lead { color: var(--muted); max-width: 68ch; font-size: 1.04rem; }
+.head { display: grid; gap: 10px; }
+.eyebrow { font-family: var(--font-body); font-size: .74rem; color: var(--marker); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.eyebrow a { color: inherit; text-decoration: none; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 12px; align-content: start; box-shadow: var(--shadow); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.stat { display: grid; gap: 4px; }
+.stat .num { font-family: var(--font-mono); font-size: 1.7rem; font-weight: 700; }
+.stat .cap { font-size: .84rem; color: var(--muted); }
+
+.modlist { display: grid; gap: 10px; }
+.modrow { display: grid; grid-template-columns: 52px 1fr auto; gap: 14px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; text-decoration: none; color: var(--ink); box-shadow: var(--shadow); transition: border-color .15s, transform .15s; }
+.modrow:hover { border-color: var(--accent); transform: translateY(-1px); }
+.modrow .code { font-family: var(--font-mono); font-weight: 700; color: var(--accent); font-size: 1rem; background: var(--accent-soft); border-radius: 10px; height: 44px; display: grid; place-items: center; }
+.modrow .sub { font-size: .84rem; color: var(--muted); }
+.pill { font-size: .74rem; font-weight: 600; padding: 3px 10px; border-radius: 99px; background: var(--sunken); color: var(--muted); white-space: nowrap; }
+.pill.done { background: var(--good-soft); color: var(--good); }
+.pill.part { background: var(--marker-soft); color: var(--marker); }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; background: var(--sunken); }
+tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: color-mix(in srgb, var(--sunken) 55%, transparent); }
+tr.modsep td { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.check input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: none; }
+.check.is-done span { color: var(--muted); }
+.deliver { font-weight: 600; }
+.deliver::before { content: "★ "; color: var(--marker); }
+
+.section { display: grid; gap: 14px; }
+.callout { border-left: 3px solid var(--marker); background: var(--marker-soft); padding: 14px 18px; border-radius: 0 12px 12px 0; }
+.mistakes li::marker { content: "✕  "; color: var(--bad); }
+pre { font-family: var(--font-mono); font-size: .84rem !important; line-height: 1.6; background: var(--sunken) !important; border: 1px solid var(--line); border-radius: 12px !important; padding: 14px 16px !important; overflow-x: auto; }
+
+details.case { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+details.case > summary { cursor: pointer; padding: 15px 18px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+details.case > summary::-webkit-details-marker { display: none; }
+details.case[open] > summary { border-bottom: 1px solid var(--line); }
+details.case .body { padding: 14px 18px 18px; display: grid; gap: 10px; }
+.hint { background: var(--accent-soft); border-radius: 10px; padding: 12px 14px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); padding: 9px 16px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: .92rem; text-decoration: none; }
+.btn:hover { filter: brightness(1.07); }
+.btn.ghost { background: transparent; color: var(--accent); }
+.btn.ghost:hover { background: var(--accent-soft); filter: none; }
+.btn.is-done { background: var(--good); border-color: var(--good); color: var(--good-ink); }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.q { display: grid; gap: 10px; }
+.q .stem { font-weight: 600; }
+.opts { display: grid; gap: 8px; }
+.opt { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; cursor: pointer; background: var(--surface); }
+.opt:hover { border-color: var(--accent); }
+.opt input { margin-top: 4px; accent-color: var(--accent); }
+.opt .k { font-family: var(--font-mono); font-weight: 700; color: var(--muted); }
+.opt.correct { border-color: var(--good); background: var(--good-soft); }
+.opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+.explain { font-size: .92rem; padding: 10px 12px; border-radius: 10px; background: var(--sunken); }
+.score { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.score .big { font-family: var(--font-mono); font-size: 2rem; font-weight: 700; }
+.verdict { font-weight: 700; padding: 4px 12px; border-radius: 99px; }
+.verdict.pass { background: var(--good-soft); color: var(--good); }
+.verdict.fail { background: var(--bad-soft); color: var(--bad); }
+
+.calc { display: grid; gap: 12px; }
+.calc .fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.calc label { display: grid; gap: 4px; font-size: .8rem; color: var(--muted); font-weight: 600; }
+.calc input { font: inherit; font-family: var(--font-mono); padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--sunken); color: var(--ink); width: 100%; }
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.res { background: var(--sunken); border-radius: 10px; padding: 10px 12px; display: grid; gap: 2px; }
+.res b { font-family: var(--font-mono); font-size: 1.25rem; }
+.res span { font-size: .78rem; color: var(--muted); }
+.res.badv b { color: var(--bad); } .res.goodv b { color: var(--good); }
+.search { font: inherit; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; width: 100%; max-width: 420px; background: var(--surface); color: var(--ink); }
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 10px 16px; border-radius: 10px; font-size: .9rem; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 60; }
+.toast.show { opacity: 1; }
+.pager { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-top: 1px solid var(--line); padding-top: 18px; }
+.pager a { text-decoration: none; font-weight: 600; }
+.pdfcard { padding: 14px 18px; border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); background: var(--accent-soft); box-shadow: none; }
+.pdficon { font-family: var(--font-mono); font-weight: 700; font-size: .72rem; color: #fff; background: var(--bad); border-radius: 6px; padding: 8px 7px; }
+.linkbtn { background: none; border: 0; color: var(--accent); font-weight: 600; cursor: pointer; padding: 0; text-decoration: underline; }
+
+/* ---------- Trang bài giảng ---------- */
+.lesson-hero { display: grid; gap: 14px; padding-bottom: 6px; }
+.lesson-hero h1 { font-size: clamp(1.8rem, 2.6vw, 2.35rem); }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { font-size: .8rem; padding: 4px 11px; border-radius: 99px; background: var(--surface); border: 1px solid var(--line); color: var(--muted); font-weight: 500; }
+.chip.ok { background: var(--good-soft); color: var(--good); border-color: transparent; font-weight: 600; }
+.steps { display: flex; align-items: center; gap: 0; margin-top: 4px; }
+.step { display: flex; align-items: center; text-decoration: none; }
+.step i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-family: var(--font-mono); font-size: .76rem; font-weight: 700; border: 1.5px solid var(--line); background: var(--surface); color: var(--muted); }
+.step + .step::before { content: ""; width: 26px; height: 2px; background: var(--line); }
+.step.done i { background: var(--good); border-color: var(--good); color: var(--good-ink); }
+.step.cur i { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 0 4px var(--accent-soft); }
+.steps-label { font-size: .8rem; color: var(--muted); margin-left: 12px; }
+.overview { display: grid; grid-template-columns: 1.05fr 1fr; gap: 16px; }
+.timeline { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.timeline li { display: grid; grid-template-columns: 62px 1fr; gap: 12px; padding: 7px 0; font-size: .88rem; line-height: 1.45; border-bottom: 1px dashed var(--line); }
+.timeline li:last-child { border-bottom: 0; }
+.timeline .t { font-family: var(--font-mono); font-size: .76rem; color: var(--accent); font-weight: 700; padding-top: 2px; }
+.goals { list-style: none; padding: 0; gap: 10px; }
+.goals li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; font-size: .94rem; }
+.goals li::before { content: "✓"; width: 20px; height: 20px; border-radius: 6px; background: var(--good-soft); color: var(--good); display: grid; place-items: center; font-size: .72rem; font-weight: 700; margin-top: 2px; }
+.lesson-part { display: grid; gap: 14px; padding-top: 6px; }
+.lesson-part > h2 { display: flex; align-items: baseline; gap: 12px; }
+.pnum { font-family: var(--font-mono); font-size: .9rem; color: var(--accent); background: var(--accent-soft); border-radius: 8px; padding: 2px 8px; flex: none; }
+.lesson-part > p, .lesson-part > ul, .lesson-part > ol { max-width: 70ch; font-size: 1.02rem; line-height: 1.75; }
+.activity { border: 1px solid color-mix(in srgb, var(--marker) 45%, var(--line)); background: linear-gradient(180deg, var(--marker-soft), var(--surface) 70%); }
+.homework { border-left: 4px solid var(--accent); }
+.pcards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; border-top: 1px solid var(--line); padding-top: 22px; }
+.pc { display: grid; gap: 4px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); text-decoration: none; color: var(--ink); transition: border-color .15s, transform .15s; }
+.pc:hover { border-color: var(--accent); transform: translateY(-1px); }
+.pc span { font-size: .78rem; color: var(--muted); font-weight: 600; }
+.pc b { font-size: .95rem; line-height: 1.35; }
+.pc.next { text-align: right; }
+.pc.empty { visibility: hidden; }
+
+/* ---------- Cột phải ---------- */
+.rail { grid-area: rail; position: sticky; top: var(--top-h); height: calc(100vh - var(--top-h)); overflow-y: auto; padding: 28px 18px 24px 4px; display: grid; gap: 22px; align-content: start; scrollbar-width: thin; }
+.rail-box { display: grid; gap: 10px; }
+.rail-title { font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 700; }
+.toc { display: grid; gap: 1px; border-left: 1px solid var(--line); }
+.toc button { text-align: left; background: none; border: 0; border-left: 2px solid transparent; margin-left: -1px; padding: 5px 0 5px 12px; font-size: .84rem; color: var(--muted); cursor: pointer; line-height: 1.4; }
+.toc button:hover { color: var(--ink); }
+.toc button.on { color: var(--accent); border-left-color: var(--accent); font-weight: 600; }
+.rail .tool { display: grid; gap: 8px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.rail .tool .btn { justify-content: center; width: 100%; }
+.rail .tool .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rail .tool .two .btn { padding: 8px 10px; font-size: .84rem; }
+.kbd { font-size: .78rem; color: var(--muted); display: grid; gap: 6px; }
+kbd { font-family: var(--font-mono); font-size: .72rem; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 1px 6px; background: var(--surface); color: var(--ink); }
+.pdf-inline { display: none; }
+
+/* ---------- Chế độ ---------- */
+.shell.noside { grid-template-columns: 0 minmax(0,1fr) var(--rail-w); }
+.shell.noside .sidebar { visibility: hidden; border: 0; padding: 0; }
+.shell.focus { grid-template-columns: 0 minmax(0,1fr) 0; }
+.shell.focus .sidebar, .shell.focus .rail { visibility: hidden; padding: 0; border: 0; overflow: hidden; }
+.shell.focus main > * { max-width: 740px; }
+.scrim { display: none; }
+
+@media (max-width: 1279px) {
+  .shell { grid-template-columns: var(--side-w) minmax(0,1fr) 0; }
+  .shell.noside { grid-template-columns: 0 minmax(0,1fr) 0; }
+  .rail { visibility: hidden; padding: 0; overflow: hidden; }
+  .pdf-inline { display: block; }
+  .cprog span.txt { display: none; }
+}
+@media (max-width: 1023px) {
+  :root { --side-w: 300px; }
+  .shell, .shell.noside, .shell.focus { grid-template-columns: minmax(0,1fr); grid-template-areas: "top" "main"; }
+  .sidebar { position: fixed; left: 0; top: var(--top-h); bottom: 0; height: auto; width: min(86vw, var(--side-w)); z-index: 40; transform: translateX(-102%); transition: transform .22s ease; visibility: visible !important; padding: 18px 12px 28px !important; border-right: 1px solid var(--line) !important; box-shadow: 0 10px 40px rgba(0,0,0,.18); }
+  .rail { display: none; }
+  .shell.side-open .sidebar { transform: none; }
+  .shell.side-open .scrim { display: block; position: fixed; inset: var(--top-h) 0 0 0; background: rgba(10,14,22,.4); z-index: 35; }
+  main { padding: 26px 18px 70px; }
+  .overview, .pcards { grid-template-columns: 1fr; }
+  .pc.next { text-align: left; }
+  .crumbs .hide-sm { display: none; }
+  h1 { font-size: 1.7rem; }
+}
+@media (max-width: 560px) {
+  .cprog, #tg-focus, .crumbs { display: none; }
+  .modrow { grid-template-columns: 44px 1fr; }
+  .modrow .pill { grid-column: 2; justify-self: start; }
+  .steps { overflow-x: auto; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media print { .topbar, .sidebar, .rail, .pcards, #discuss { display: none !important; } .shell { display: block; } }
+
+/* ---------- Tìm kiếm (Ctrl K) ---------- */
+.searchbtn { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--sunken); color: var(--muted); cursor: pointer; font-size: .86rem; min-width: 220px; margin-left: 8px; }
+.searchbtn:hover { border-color: var(--accent); color: var(--ink); }
+.searchbtn kbd { margin-left: auto; }
+.sbox { position: fixed; inset: 0; z-index: 70; background: rgba(10,14,22,.45); display: none; align-items: flex-start; justify-content: center; padding: 10vh 16px 16px; }
+.sbox.open { display: flex; }
+.spanel { width: min(640px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 24px 70px rgba(0,0,0,.28); overflow: hidden; display: grid; grid-template-rows: auto 1fr auto; max-height: 72vh; }
+.sinput { font: inherit; font-size: 1.05rem; border: 0; border-bottom: 1px solid var(--line); padding: 16px 18px; background: transparent; color: var(--ink); outline: none; width: 100%; }
+.sres { overflow-y: auto; padding: 8px; display: grid; gap: 2px; align-content: start; }
+.shit { display: grid; gap: 2px; padding: 9px 12px; border-radius: 10px; text-decoration: none; color: var(--ink); cursor: pointer; }
+.shit small { color: var(--muted); font-size: .76rem; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.shit span { font-size: .92rem; line-height: 1.4; }
+.shit.sel, .shit:hover { background: var(--accent-soft); }
+.shit.sel span { color: var(--accent); }
+.sfoot { border-top: 1px solid var(--line); padding: 8px 14px; font-size: .76rem; color: var(--muted); display: flex; gap: 14px; }
+.sempty { padding: 18px; color: var(--muted); font-size: .92rem; }
+@media (max-width: 1279px) { .searchbtn { min-width: 0; } .searchbtn .lbl, .searchbtn kbd { display: none; } }
+
+/* ---------- Tab mục lục ---------- */
+.stabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; background: var(--sunken); border-radius: 10px; margin: 0 4px; position: sticky; top: -18px; z-index: 2; box-shadow: 0 6px 10px -6px var(--surface); }
+.stab { border: 0; background: transparent; padding: 7px 4px; border-radius: 8px; font-size: .82rem; font-weight: 600; color: var(--muted); cursor: pointer; }
+.stab:hover { color: var(--ink); }
+.stab.on { background: var(--surface); color: var(--accent); box-shadow: var(--shadow); }
+.spanel-nav { display: grid; gap: 18px; align-content: start; }
+.nv.tall { align-items: flex-start; padding: 8px 10px; }
+.nvt { display: grid; gap: 1px; }
+.nvt small { font-size: .74rem; color: var(--muted); font-weight: 400; }
+.nv.active .nvt small { color: color-mix(in srgb, var(--accent) 70%, var(--muted)); }
+.tchips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 0 4px; }
+.tchip { display: grid; gap: 1px; justify-items: center; padding: 9px 4px; border: 1px solid var(--line); border-radius: 10px; text-decoration: none; color: var(--ink); background: var(--surface); }
+.tchip:hover { border-color: var(--accent); }
+.tchip b { font-size: .82rem; }
+.tchip span { font-family: var(--font-mono); font-size: .7rem; color: var(--muted); }
+.tchip.pass { background: var(--good-soft); border-color: transparent; } .tchip.pass span { color: var(--good); font-weight: 700; }
+.tchip.fail { background: var(--bad-soft); border-color: transparent; } .tchip.fail span { color: var(--bad); font-weight: 700; }
+.tchip.on { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* ---------- Trình xem PDF trong trang ---------- */
+.pdfview { position: fixed; inset: 0; z-index: 80; background: rgba(10,14,22,.72); display: none; grid-template-rows: auto 1fr; }
+.pdfview.open { display: grid; }
+.pv-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.pv-title { font-size: .95rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-pages { font-size: .82rem; color: var(--muted); white-space: nowrap; }
+.pv-act { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.pv-act .iconbtn { font-size: 1.2rem; font-weight: 700; }
+.pv-body { overflow: auto; padding: 20px 16px 40px; display: grid; justify-items: center; align-content: start; gap: 16px; }
+.pv-page { background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.35); border-radius: 4px; max-width: none; }
+.pv-msg { color: #fff; padding: 40px 16px; text-align: center; max-width: 520px; }
+</style>
+</head>
+<body>
+<div class="shell" id="shell">
+  <header class="topbar">
+    <button class="iconbtn" id="tg-side" aria-label="Ẩn/hiện mục lục khóa học" title="Mục lục ( [ )"><svg class="i" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h14"/></svg></button>
+    <div class="top-title"><a class="logo" id="logo" href="#home" title="Trang chủ">PM</a><nav class="crumbs" id="crumbs" aria-label="Vị trí"></nav></div>
+    <button class="searchbtn" id="tg-search" aria-label="Tìm kiếm trong khóa học" title="Tìm kiếm (Ctrl K)"><svg class="i" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2L17 17"/></svg><span class="lbl">Tìm bài học, thuật ngữ…</span><kbd>Ctrl K</kbd></button>
+    <div class="top-right">
+      <div class="cprog" id="cprog"></div>
+      <button class="iconbtn" id="tg-focus" aria-pressed="false" aria-label="Chế độ tập trung" title="Chế độ tập trung (F)"><svg class="i" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M17 7V3h-4M3 13v4h4M17 13v4h-4"/></svg></button>
+      <button class="iconbtn" id="tg-theme" aria-label="Đổi giao diện sáng/tối" title="Sáng / tối"><svg class="i" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 12.2A7 7 0 017.8 3.5a7 7 0 108.7 8.7z"/></svg></button>
+      <div id="account-top"></div>
+    </div>
+  </header>
+  <aside class="sidebar" id="nav" aria-label="Mục lục khóa học"></aside>
+  <main id="view" tabindex="-1"></main>
+  <aside class="rail" id="rail" aria-label="Trong trang này"></aside>
+  <div class="scrim" id="scrim"></div>
+</div>
+<div class="sbox" id="sbox" role="dialog" aria-modal="true" aria-label="Tìm kiếm"><div class="spanel"><input class="sinput" id="sinput" type="search" placeholder="Tìm buổi học, khái niệm, thuật ngữ, biểu mẫu…" autocomplete="off"><div class="sres" id="sres"></div><div class="sfoot"><span><kbd>↑</kbd> <kbd>↓</kbd> chọn</span><span><kbd>Enter</kbd> mở</span><span><kbd>Esc</kbd> đóng</span></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="../../platform/config.js"></script>
+<script src="../../platform/vendor/supabase.js"></script>
+<script src="../../platform/platform.js"></script>
+<script src="js/lessons-m1.js"></script>
+<script src="js/lessons-m2.js"></script>
+<script src="js/lessons-m3.js"></script>
+<script src="js/lessons-m4.js"></script>
+<script src="js/lessons-m5.js"></script>
+<script src="js/lessons-m6.js"></script>
+<script src="js/lessons-m7.js"></script>
+<script src="js/answers-m1-2.js"></script>
+<script src="js/answers-m3-4.js"></script>
+<script src="js/answers-m5-6.js"></script>
+<script src="js/answers-m7.js"></script>
+<script src="js/career.js"></script>
+<script>
+/* ===================== DỮ LIỆU KHÓA HỌC ===================== */
+const SESSIONS = [
+  [1,1,1,"Dự án CNTT là gì; vai trò PM, Scrum Master, Product Owner, BA","So sánh các vai trò trong công ty bạn"],
+  [2,1,1,"Vòng đời dự án; Predictive, Agile, Hybrid; các mô hình SDLC","Chọn mô hình cho FreshGo"],
+  [3,1,2,"Bên liên quan, Business Case, mục tiêu SMART","Bản đồ bên liên quan"],
+  [4,1,2,"Project Charter và buổi Kickoff","Nộp: Project Charter"],
+  [5,2,3,"Thu thập yêu cầu, SRS, Scope Statement","Viết phạm vi trong / ngoài"],
+  [6,2,3,"WBS và từ điển WBS","WBS 3 cấp"],
+  [7,2,4,"Ước lượng: chuyên gia, tương tự, ba điểm (PERT), Function Point","Ước lượng man-day"],
+  [8,2,4,"Tiến độ (Gantt, đường găng), ngân sách, hợp đồng Fixed Price vs T&M","Nộp: Kế hoạch dự án"],
+  [9,3,5,"Tuyên ngôn Agile, khung Scrum: 3 trách nhiệm, 5 sự kiện, 3 tạo tác","Sơ đồ Scrum"],
+  [10,3,5,"Product Backlog, Epic, User Story, INVEST, Refinement","Viết 10 user story"],
+  [11,3,6,"Sprint Planning, Daily, Review, Retro; Story Point, Planning Poker","Điều phối Sprint Planning"],
+  [12,3,6,"Kanban, WIP, chỉ số Agile, mô hình Hybrid","Nộp: Backlog + Sprint 1 trên Jira"],
+  [13,4,7,"QA và QC, các cấp độ kiểm thử, Definition of Done, UAT","Viết DoD và kế hoạch UAT"],
+  [14,4,7,"Quản lý rủi ro: nhận diện, đánh giá, ứng phó, Risk Register","Risk Register 10 rủi ro"],
+  [15,4,8,"Kiểm soát thay đổi, Change Request, phình phạm vi","Xử lý 1 Change Request"],
+  [16,4,8,"Issue, escalation, phát hành và triển khai (go-live)","Nộp: Kế hoạch rủi ro & chất lượng"],
+  [17,5,9,"Kế hoạch giao tiếp, báo cáo trạng thái (RAG)","Báo cáo tuần"],
+  [18,5,9,"Xây dựng team (Tuckman), servant leadership, giao việc","Kế hoạch onboarding"],
+  [19,5,10,"Xung đột và đàm phán với khách hàng","Đóng vai đàm phán"],
+  [20,5,10,"Làm việc với khách hàng nước ngoài, mô hình offshore/ODC","Nộp: Email xử lý tình huống khó"],
+  [21,6,11,"EVM (PV, EV, AC, CPI, SPI), burndown, velocity","Tính EVM cho FreshGo"],
+  [22,6,11,"Nghiệm thu, bàn giao, bảo hành, Lessons Learned","Biên bản nghiệm thu"],
+  [23,6,12,"Capstone: khắc phục một dự án đang “cháy”","Báo cáo phương án"],
+  [24,6,12,"Thi cuối khóa và bảo vệ capstone","Nộp: Hồ sơ dự án hoàn chỉnh"],
+  [25,7,13,"AI cho PM: prompt, báo cáo, biên bản, người duyệt cuối","Báo cáo + biên bản soạn bằng AI"],
+  [26,7,13,"Quản trị AI: dữ liệu, pháp lý, chính sách team, dự án có tính năng AI","Nộp: Thư viện prompt + chính sách AI"]
+];
+
+const MODULES = [
+  { id:1, title:"Tổng quan & Khởi tạo dự án", weeks:"Tuần 1–2", test:1,
+    lead:"Dự án thất bại nhiều nhất ở giai đoạn khởi tạo, vì chưa ai thống nhất “xong” nghĩa là gì. Module này dạy cách chốt điều đó trước khi viết dòng code đầu tiên.",
+    core:[
+      "<b>Dự án</b> là nỗ lực tạm thời, có điểm bắt đầu và kết thúc, để tạo ra kết quả duy nhất. <b>Vận hành</b> thì lặp đi lặp lại. Bảo trì hệ thống là vận hành; nâng cấp lên phiên bản 2.0 là dự án.",
+      "<b>Đặc thù dự án CNTT:</b> sản phẩm vô hình, yêu cầu hay đổi, công nghệ đổi nhanh, ước lượng khó, phụ thuộc nhiều vào con người.",
+      "<b>Ba vai hay bị nhầm:</b> PM chịu trách nhiệm phạm vi, tiến độ, chi phí và các bên liên quan. Product Owner quyết định làm gì trước để tối đa giá trị. Scrum Master giúp team làm Scrum đúng và gỡ vướng mắc, không phải người giao việc.",
+      "<b>Chọn cách làm:</b> Predictive (Waterfall) hợp với yêu cầu rõ và hợp đồng trọn gói. Agile hợp với yêu cầu chưa rõ, cần phản hồi sớm. Hybrid phổ biến nhất ở Việt Nam: kế hoạch tổng thể theo mốc, bên trong chạy Sprint.",
+      "<b>Business Case</b> trả lời “vì sao nên bỏ tiền”. <b>Project Charter</b> trả lời “dự án này là gì, ai chịu trách nhiệm” và trao quyền cho PM.",
+      "<b>Phân tích bên liên quan</b> bằng lưới Quyền lực × Quan tâm: quản lý chặt · giữ hài lòng · thông báo đầy đủ · theo dõi.",
+      "<b>Mục tiêu SMART:</b> cụ thể, đo được, khả thi, liên quan, có hạn.",
+      "<b>Giá trị kinh doanh:</b> tính thời gian hoàn vốn, ROI và lập kế hoạch đo lợi ích (KPI có mức nền, mục tiêu, người đo). Ghi rõ giả định."
+    ],
+    example:"<p><b>Mục tiêu kém:</b> “Làm app bán hàng tốt.”</p><p><b>Mục tiêu SMART:</b> “Ra mắt app iOS/Android cho 30 cửa hàng trước 30/6, đạt 5.000 đơn/tháng sau 3 tháng, tỷ lệ lỗi thanh toán dưới 1%.”</p><p><b>Cần quản lý chặt:</b> CEO chuỗi (nhà tài trợ), Giám đốc vận hành, đối tác cổng thanh toán. <b>Cần thông báo đầy đủ:</b> quản lý cửa hàng, shipper.</p>",
+    mistakes:["Bắt đầu code khi chưa có người ký duyệt phạm vi.","Quên các bên liên quan “ẩn” như pháp chế, IT nội bộ khách hàng, đơn vị bảo mật. Họ thường xuất hiện sát ngày go-live và chặn phát hành.","Dev được lên làm PM nhưng vẫn ôm code, bỏ việc quản lý."],
+    reading:[["Hướng dẫn PMP tiếng Việt – Guru99","https://www.guru99.com/vi/pmp-tutorial.html"],["Đề cương QLDA CNTT – ĐH Dân lập Hải Phòng","https://lib.hpu.edu.vn/jspui/bitstream/123456789/22978/1/Decuong_Quanlyduan_CNTT.pdf"]]
+  },
+  { id:2, title:"Lập kế hoạch: phạm vi, ước lượng, tiến độ, chi phí", weeks:"Tuần 3–4", test:1, tool:"pert",
+    lead:"Một kế hoạch tốt không phải là kế hoạch đúng tuyệt đối. Đó là kế hoạch cho biết sớm khi dự án bắt đầu lệch.",
+    core:[
+      "<b>Scope Statement</b> phải ghi rõ cả <b>ngoài phạm vi</b>. Đây là vũ khí số 1 chống phình phạm vi.",
+      "<b>WBS</b> phân rã theo sản phẩm bàn giao, không theo người làm. Gói việc thấp nhất nên 8–80 giờ (quy tắc 8/80). Quy tắc 100%: các con cộng lại đúng bằng cha, không thừa không thiếu.",
+      "<b>Các cách ước lượng:</b> chuyên gia (hỏi người đã làm); tương tự (so với dự án cũ); tham số (số màn hình × man-day/màn hình); ba điểm PERT: <span class=\"mono\">E = (O + 4M + P) / 6</span>; Story Point (tương đối, dùng trong Agile).",
+      "<b>Tiến độ:</b> xác định phụ thuộc, vẽ Gantt, tìm <b>đường găng</b> (chuỗi việc dài nhất, không có dự trữ). Muốn rút ngắn dự án thì chỉ nén việc trên đường găng: thêm người (crashing) hoặc làm song song (fast-tracking).",
+      "<b>Ngân sách</b> = nhân sự (man-month × đơn giá) + hạ tầng + license + <b>dự phòng rủi ro 10–20%</b>.",
+      "<b>Hợp đồng:</b> Fixed Price thì rủi ro thuộc về bên làm, cần chốt phạm vi chặt. Time & Material thì rủi ro thuộc về khách hàng, linh hoạt, hợp với Agile. ODC là thuê cả một team dài hạn.",
+      "<b>Presales:</b> đọc RFP, ước lượng, cộng dự phòng, tính giá = chi phí ÷ (1 − biên lợi nhuận mục tiêu); theo dõi lợi nhuận dự án hằng tháng."
+    ],
+    example:"<p><b>Ước lượng ba điểm cho tích hợp cổng thanh toán:</b> O = 10, M = 15, P = 32 man-day → E = (10 + 60 + 32) / 6 = <b>17 man-day</b>.</p><p><b>Ngân sách:</b> 8 người × 6 tháng = 48 man-month × 42 triệu = 2,016 tỷ. Cộng hạ tầng 0,1 tỷ và dự phòng 0,284 tỷ (khoảng 13%) thì tổng là <b>2,4 tỷ</b>.</p>",
+    mistakes:["Ước lượng thay cho dev rồi ép họ cam kết. Nên để người làm tự ước lượng.","Quên các việc “không phải code”: họp, review, sửa bug, UAT, tài liệu, deploy. Những việc này thường chiếm 30–40% công sức.","Lập kế hoạch với 100% công suất. Thực tế mỗi người chỉ làm hiệu quả khoảng 6 giờ mỗi ngày."],
+    reading:[["Kiến thức cơ bản và cách tạo WBS – Viblo","https://viblo.asia/p/kien-thuc-co-ban-va-cach-tao-wbs-4P85631GKY3"],["WBS là gì? – MISA AMIS","https://amis.misa.vn/45608/wbs-la-gi/"],["Đề cương Quản lý dự án phần mềm – ĐH Sao Đỏ","https://saodo.edu.vn/uploads/about/ctdt2022/cntt/cntt106.pdf"]]
+  },
+  { id:3, title:"Agile & Scrum", weeks:"Tuần 5–6", test:2,
+    lead:"Scrum là khung làm việc để học nhanh từ sản phẩm thật, không phải một chuỗi cuộc họp. Nguồn chuẩn duy nhất là Scrum Guide 2020 (vẫn là bản chính thức hiện hành), khoảng 14 trang và có bản tiếng Việt.",
+    core:[
+      "<b>Tuyên ngôn Agile</b> coi trọng hơn: con người và tương tác, phần mềm chạy được, cộng tác với khách hàng, phản hồi với thay đổi. Những thứ còn lại (quy trình, tài liệu, hợp đồng, kế hoạch) vẫn cần, chỉ được đặt sau.",
+      "<b>Ba trụ cột:</b> minh bạch, thanh tra, thích ứng.",
+      "<b>3 trách nhiệm:</b> Product Owner (giá trị và thứ tự Backlog), Scrum Master (hiệu quả của team), Developers (tạo ra Increment). Team thường từ 10 người trở xuống.",
+      "<b>5 sự kiện</b> (giới hạn thời gian cho Sprint 1 tháng): Sprint ≤ 1 tháng · Sprint Planning ≤ 8 giờ · Daily Scrum 15 phút · Sprint Review ≤ 4 giờ · Retrospective ≤ 3 giờ.",
+      "<b>3 tạo tác và cam kết:</b> Product Backlog ↔ Product Goal · Sprint Backlog ↔ Sprint Goal · Increment ↔ Definition of Done.",
+      "<b>User Story:</b> “Là [vai trò], tôi muốn [hành động] để [lợi ích]”, kèm tiêu chí chấp nhận Given/When/Then. Story tốt đạt <b>INVEST</b>: Độc lập, Thương lượng được, Có giá trị, Ước lượng được, Nhỏ, Kiểm thử được.",
+      "<b>Velocity</b> là số điểm team làm xong trung bình mỗi Sprint. Chỉ dùng để dự báo, không dùng để so sánh các team.",
+      "<b>Kanban:</b> trực quan hóa luồng việc, giới hạn WIP, đo lead time. Hợp với team bảo trì và vận hành."
+    ],
+    example:"<p><b>Story:</b> “Là khách hàng, tôi muốn lưu địa chỉ giao hàng mặc định để đặt hàng nhanh hơn.”</p><p><b>Tiêu chí:</b> <i>Given</i> tôi đã đăng nhập và có 2 địa chỉ, <i>When</i> tôi đánh dấu một địa chỉ là mặc định, <i>Then</i> màn thanh toán tự điền địa chỉ đó.</p><p><b>Dự báo:</b> 3 Sprint đầu đạt 28, 32, 30 điểm (trung bình 30). Backlog còn 240 điểm → cần khoảng <b>8 Sprint (16 tuần)</b>, vượt mốc 6 tháng, nên cần bàn với PO để cắt phạm vi.</p>",
+    mistakes:["Daily Scrum biến thành buổi báo cáo cho sếp.","PO vắng mặt, team tự đoán yêu cầu.","Đổi Sprint Goal giữa Sprint mà không hỏi team.","“Scrum” nhưng không có Retro, hay Retro không có hành động cải tiến nào."],
+    reading:[["Scrum Guide 2020 – chọn bản Tiếng Việt","https://scrumguides.org/"],["User story và tiêu chí chấp nhận – Viblo","https://viblo.asia/p/user-story-la-gi-va-tieu-chi-chap-nhan-maGK7W8BKj2"],["Tìm hiểu Kanban trong 10 phút – Viblo","https://viblo.asia/p/tim-hieu-ve-kanban-trong-10-phut-OeVKBMzy5kW"],["Jira là gì? Hướng dẫn A–Z – ITviec","https://itviec.com/blog/jira-la-gi/"]]
+  },
+  { id:4, title:"Chất lượng, rủi ro, thay đổi", weeks:"Tuần 7–8", test:2,
+    lead:"PM giỏi không phải người không gặp sự cố. Đó là người thấy rủi ro trước và có quy trình để mọi thay đổi đều được cân nhắc về chi phí.",
+    core:[
+      "<b>QA và QC:</b> QA phòng lỗi bằng quy trình (code review, coding standard, CI). QC tìm lỗi trên sản phẩm (kiểm thử). Lỗi phát hiện càng muộn, chi phí sửa càng tăng theo cấp số nhân.",
+      "<b>Các cấp kiểm thử:</b> Unit → Integration → System → UAT. UAT do khách hàng thực hiện và là điều kiện để nghiệm thu.",
+      "<b>Definition of Done:</b> checklist chất lượng chung cho mọi story, ví dụ code đã review, unit test ≥ 70%, không còn bug Critical, đã lên staging.",
+      "<b>Quy trình rủi ro:</b> Nhận diện → Đánh giá (khả năng × ảnh hưởng) → Lập phương án ứng phó → Theo dõi hằng tuần.",
+      "<b>4 cách ứng phó:</b> Tránh (đổi kế hoạch để rủi ro biến mất) · Giảm (hạ khả năng hoặc ảnh hưởng) · Chuyển giao (sang bên thứ ba qua hợp đồng, bảo hiểm) · Chấp nhận (có hoặc không kèm dự phòng).",
+      "<b>Rủi ro và Issue:</b> rủi ro là việc <i>có thể</i> xảy ra; issue là việc <i>đã</i> xảy ra, cần xử lý ngay.",
+      "<b>Kiểm soát thay đổi:</b> mọi yêu cầu mới đi qua Change Request: phân tích tác động (phạm vi, thời gian, chi phí, chất lượng) → người có thẩm quyền duyệt hoặc từ chối → cập nhật kế hoạch. Trong Scrum, yêu cầu mới vào Product Backlog để PO sắp xếp.",
+      "<b>Escalation</b> cần thống nhất từ đầu: vấn đề gì, chờ bao lâu thì báo ai. Khi báo lên, luôn mang theo phương án đề xuất.",
+      "<b>Kỹ thuật tối thiểu cho PM:</b> môi trường dev/staging/production, CI/CD, release plan, rollback, feature flag; yêu cầu bảo mật như ISO 27001, pentest."
+    ],
+    example:"<div class=\"tablewrap\"><table><thead><tr><th>Rủi ro</th><th>KN</th><th>AH</th><th>Điểm</th><th>Ứng phó</th></tr></thead><tbody><tr><td>Cổng thanh toán cấp sandbox trễ</td><td class=\"num\">4</td><td class=\"num\">5</td><td class=\"num\">20</td><td>Giảm: gửi hồ sơ từ tuần 1, dùng mock API để dev trước</td></tr><tr><td>Dev mobile duy nhất nghỉ việc</td><td class=\"num\">2</td><td class=\"num\">5</td><td class=\"num\">10</td><td>Giảm: pair programming, tài liệu kiến trúc</td></tr><tr><td>App bị Apple từ chối khi review</td><td class=\"num\">3</td><td class=\"num\">3</td><td class=\"num\">9</td><td>Giảm: đọc guideline, nộp sớm 2 tuần</td></tr></tbody></table></div>",
+    mistakes:["Risk Register viết một lần rồi để đó, không ai cập nhật.","Nhận yêu cầu “nhỏ thôi mà” qua chat mà không đánh giá tác động. Đây là gốc của phình phạm vi.","Cắt thời gian test để kịp deadline."],
+    reading:[["Phân tích và quản trị rủi ro dự án phần mềm – Viblo","https://viblo.asia/p/project-management-phan-tich-va-quan-tri-rui-ro-trong-du-an-phan-mem-5OXLAknr4Gr"],["Bàn về quản lý rủi ro trong dự án Scrum – Viblo","https://viblo.asia/p/ban-ve-quan-ly-rui-ro-trong-mot-du-an-scrum-6J3ZgPGxlmB"],["Definition of Done và Acceptance Criteria – Viblo","https://viblo.asia/p/loat-bai-ve-scrum-defiition-of-done-va-acceptance-criteria-duoi-goc-nhin-cua-blogger-nhat-maGK76zx5j2"]]
+  },
+  { id:5, title:"Con người & giao tiếp", weeks:"Tuần 9–10", test:3,
+    lead:"PM dành khoảng 80–90% thời gian cho giao tiếp. Muốn chuyển từ dev sang PM, đây là kỹ năng phải rèn nhiều nhất.",
+    core:[
+      "<b>Kế hoạch giao tiếp:</b> ai cần biết gì, lúc nào, qua kênh nào, ai gửi. Ví dụ: CEO nhận báo cáo 1 trang qua email mỗi thứ Sáu; team họp Daily 9h15.",
+      "<b>Báo cáo RAG:</b> Xanh là đúng kế hoạch; Vàng là có rủi ro nhưng đã có phương án; Đỏ là cần cấp trên quyết định. Đừng để một mục Vàng cứ ở mãi đó rồi bất ngờ chuyển Đỏ.",
+      "<b>Tuckman:</b> Hình thành → Sóng gió → Ổn định → Hiệu quả cao → Giải tán. Đến giai đoạn “Sóng gió”, PM cần làm rõ vai trò và quy tắc làm việc.",
+      "<b>Servant leadership:</b> PM hoặc SM phục vụ team, gỡ vướng và bảo vệ team khỏi bị gián đoạn, thay vì ra lệnh.",
+      "<b>5 cách xử lý xung đột:</b> Hợp tác (bền vững nhất) · Thỏa hiệp · Nhường · Né tránh · Áp đặt (khi khẩn cấp).",
+      "<b>Đàm phán:</b> không trả lời “không” trống trơn. Hãy đưa ra lựa chọn: “Làm được: phương án A lùi 2 tuần, B bỏ tính năng X, C thêm 1 người và 120 triệu.”",
+      "<b>Khách hàng nước ngoài:</b> khách Nhật coi trọng báo cáo sớm (報連相 hō-ren-sō), tài liệu chi tiết và không để họ bất ngờ. Khách Âu Mỹ thích trực tiếp, chủ động đề xuất. Với cả hai: ghi biên bản họp và xác nhận lại bằng email.",
+      "<b>Quản trị:</b> chuẩn bị họp ban chỉ đạo bằng các quyết định cần đưa ra; làm việc với PMO; quản lý nhiều dự án và nhà cung cấp theo hợp đồng, SLA."
+    ],
+    example:"<p>Giám đốc vận hành muốn thêm “tích điểm thành viên” ngay trong bản ra mắt. PM không từ chối mà gửi email gồm: ước lượng 45 man-day; 3 phương án (lùi ngày ra mắt / đưa vào bản 1.1 sau 6 tuần / bỏ tính năng đánh giá sản phẩm để đổi); đề xuất phương án 2; và hạn trả lời là thứ Ba để kịp Sprint Planning.</p>",
+    mistakes:["Giấu tin xấu với hy vọng team sẽ “gỡ” được.","Báo cáo quá kỹ thuật cho lãnh đạo.","Giao việc mà không nói rõ kết quả mong đợi và hạn chót."],
+    reading:[["Quản lí risk trong dự án (chia sẻ thực tế) – Viblo","https://viblo.asia/p/quan-li-risk-trong-du-an-RnB5pyV2KPG"],["Đề cương QLDA CNTT – ĐH Hạ Long","https://old.uhl.edu.vn/wp-content/uploads/2022/03/43.-INT3014-Quan-li-du-an-CNTT.docx"]]
+  },
+  { id:6, title:"Giám sát, EVM & kết thúc", weeks:"Tuần 11–12", test:3, tool:"evm",
+    lead:"EVM trả lời bằng số liệu hai câu sếp nào cũng hỏi: “Đang nhanh hay chậm?” và “Đang lỗ hay lãi?”.",
+    core:[
+      "<b>Ba con số gốc:</b> PV (giá trị lẽ ra phải xong đến hôm nay) · EV (giá trị đã thực sự xong) · AC (số tiền đã thực sự chi).",
+      "<b>Hai chỉ số:</b> <span class=\"mono\">SPI = EV / PV</span> (dưới 1 là chậm) · <span class=\"mono\">CPI = EV / AC</span> (dưới 1 là vượt chi phí).",
+      "<b>Dự báo:</b> <span class=\"mono\">EAC = BAC / CPI</span> (tổng chi phí dự kiến khi xong) · <span class=\"mono\">VAC = BAC − EAC</span> (số tiền sẽ vượt hoặc tiết kiệm).",
+      "<b>Trong Agile:</b> theo dõi bằng burndown/burnup và velocity. Release burnup cho thấy cả tiến độ lẫn phạm vi phình ra.",
+      "<b>Kết thúc dự án:</b> UAT đạt → ký biên bản nghiệm thu → bàn giao (source code, tài liệu, tài khoản) → bảo hành → Lessons Learned → giải phóng nhân sự → đóng hợp đồng, thanh toán đợt cuối."
+    ],
+    example:"<p>Cuối tháng 3: BAC = 2,4 tỷ, PV = 1,2, EV = 1,0, AC = 1,1 tỷ → SPI 0,83 (chỉ đạt 83% tiến độ), CPI 0,91, EAC ≈ 2,64 tỷ, VAC ≈ −0,24 tỷ. Dự án chuyển <b>Đỏ</b>; PM trình nhà tài trợ các phương án: cắt phạm vi, lùi ngày hoặc dùng quỹ dự phòng. Thử lại bằng máy tính EVM bên dưới.</p>",
+    mistakes:["Tính EV theo cảm tính “xong 80%”. Nên dùng quy tắc 0/100 hoặc 50/50.","“Đóng” dự án mà không có biên bản nghiệm thu, nên khách tiếp tục đòi sửa miễn phí.","Bỏ qua Lessons Learned, nên dự án sau lặp lại đúng lỗi cũ."],
+    reading:[["Chứng chỉ PMP A–Z – ITviec","https://itviec.com/blog/chung-chi-pmp-la-gi/"],["Chứng chỉ PSM là gì – ITviec","https://itviec.com/blog/chung-chi-professional-scrum-master-la-gi/"]]
+  },
+  { id:7, title:"AI trong quản lý dự án", weeks:"Tuần 13", test:4,
+    lead:"Nhà tuyển dụng năm 2026 không hỏi “bạn có dùng AI không” mà hỏi “bạn dùng AI thế nào cho an toàn và hiệu quả”. Module này dạy cả hai phía: dùng AI làm trợ lý cho PM, và quản lý dự án có tính năng AI.",
+    core:[
+      "<b>AI tạo sinh là trợ lý soạn thảo và phân tích</b>, không phải người chịu trách nhiệm. Nó đưa bạn từ trang trắng đến bản nháp 70%; phần còn lại là việc của PM.",
+      "<b>Prompt 5 phần:</b> Vai trò · Bối cảnh · Nhiệm vụ · Định dạng · Ràng buộc. Thêm “hỏi tôi trước khi viết” và “ghi rõ giả định”.",
+      "<b>Người duyệt cuối (human-in-the-loop):</b> soát 4 điểm trước khi gửi: số liệu, tên và vai trò, cam kết, dữ liệu nhạy cảm.",
+      "<b>Rủi ro khi dùng AI:</b> lộ dữ liệu, ảo giác (hallucination), bản quyền code theo hợp đồng, lỗ hổng bảo mật, phụ thuộc. Đưa vào Risk Register.",
+      "<b>Pháp lý 2026:</b> Luật Bảo vệ dữ liệu cá nhân 2025 + Nghị định 356/2025 (hiệu lực 1/1/2026); Luật Trí tuệ nhân tạo 134/2025/QH15 (hiệu lực 1/3/2026).",
+      "<b>Chính sách AI 1 trang của team:</b> công cụ được phép, dữ liệu Xanh/Vàng/Đỏ, trách nhiệm, minh bạch, bổ sung DoD, đo lường tác động thật.",
+      "<b>Dự án có tính năng AI:</b> phụ thuộc dữ liệu, kết quả xác suất, khó ước lượng → PoC có timebox, tiêu chí nghiệm thu dạng ngưỡng, giám sát drift và chi phí API sau go-live. PMI dùng phương pháp CPMAI 6 giai đoạn."
+    ],
+    example:"<p>Chị Lan muốn thêm “gợi ý sản phẩm bằng AI” trước go-live. PM không trả lời có hay không ngay, mà hỏi về dữ liệu lịch sử mua và sự đồng ý của khách, rồi đề xuất: giai đoạn 1 làm gợi ý theo quy tắc (“thường mua kèm”, khoảng 8 man-day); chạy PoC AI 2 tuần sau go-live với tiêu chí ≥ 70% gợi ý được đánh giá liên quan. Anh Minh chọn phương án, mốc 1/7 được giữ.</p>",
+    mistakes:["Gửi thẳng báo cáo do AI soạn, trong đó có số liệu sai hoặc cam kết chưa ai đồng ý.","Dán dữ liệu khách hàng, giá hợp đồng hoặc API key vào chatbot miễn phí.","Tăng velocity kỳ vọng ngay khi team bắt đầu dùng AI, trước khi đo được tác động thật.","Ký Fixed Price cho tính năng AI chưa qua PoC."],
+    reading:[["Luật Trí tuệ nhân tạo 2025 – Thư viện Pháp luật","https://thuvienphapluat.vn/van-ban/Cong-nghe-thong-tin/Luat-Tri-tue-nhan-tao-2025-so-134-2025-QH15-679013.aspx"],["Toàn văn Nghị định 356/2025 hướng dẫn Luật Bảo vệ dữ liệu cá nhân","https://thuvienphapluat.vn/phap-luat-nha-dat/toan-van-nghi-dinh-3562025ndcp-huong-dan-luat-bao-ve-du-lieu-ca-nhan-13670.html"],["PMI – AI in Project Management (tiếng Anh)","https://www.pmi.org/ai"]]
+  }
+];
+
+const EXERCISES = {
+  1:[["1.1","Vẽ lưới Quyền lực × Quan tâm cho ít nhất 8 bên liên quan của FreshGo, kèm chiến lược cho từng ô."],["1.2","Chọn Predictive, Agile hay Hybrid cho FreshGo. Viết lập luận 150 chữ, có tính đến hợp đồng Fixed Price."],["1.3","Viết lại 3 mục tiêu dự án theo chuẩn SMART."],["N1","Nộp: Project Charter (theo Mẫu 1) và agenda buổi Kickoff 90 phút.",true]],
+  2:[["2.1","Viết Scope Statement, gồm ít nhất 5 mục “ngoài phạm vi”."],["2.2","Lập WBS 3 cấp (30–40 gói việc), ước lượng man-day. Dùng ba điểm cho 5 gói rủi ro nhất."],["2.3","Kiểm tra: tổng man-day có vừa 8 người × 6 tháng × 6 giờ hiệu quả/ngày không? Nếu không, đề xuất cắt gì."],["N2","Nộp: Kế hoạch dự án gồm WBS, Gantt có đường găng, ngân sách có dự phòng, RACI.",true]],
+  3:[["3.1","Viết 10 user story cho app khách hàng, mỗi story 2–3 tiêu chí Given/When/Then, đạt INVEST."],["3.2","Đóng vai Scrum Master: viết kịch bản Sprint Planning 2 giờ cho Sprint 1 (Sprint Goal, story được chọn, velocity giả định 25 điểm)."],["3.3","Đề xuất cách ghép Sprint (bên trong) với các mốc Fixed Price (bên ngoài)."],["N3","Nộp: Ảnh chụp Product Backlog và Sprint 1 trên Jira Free.",true]],
+  4:[["4.1","Viết Definition of Done và kế hoạch UAT: ai test, test gì, bao lâu, tiêu chí đạt."],["4.2","Lập Risk Register 10 rủi ro có chấm điểm, ít nhất 1 rủi ro về API POS và 1 về Luật Bảo vệ dữ liệu cá nhân."],["4.3","Chị Lan muốn thêm “đặt hàng định kỳ hằng tuần”: điền Change Request (Mẫu 5) với đánh giá tác động đầy đủ."],["N4","Nộp: Kế hoạch rủi ro & chất lượng (4.1 + 4.2 + 4.3).",true]],
+  5:[["5.1","Lập kế hoạch giao tiếp: ai, nhận gì, tần suất, kênh nào."],["5.2","Viết báo cáo tuần 1 trang gửi anh Minh, trạng thái Vàng vì API POS trễ."],["5.3","Đóng vai đàm phán với Claude: Claude là chị Lan, đòi tích điểm mà không lùi ngày, không tăng tiền."],["N5","Nộp: Email xử lý Tình huống 4.",true]],
+  6:[["6.1","Cuối tháng 4: PV = 1,6 tỷ, EV = 1,5 tỷ, AC = 1,45 tỷ. Tính SPI, CPI, EAC, VAC và viết 3 câu nhận định cho CEO."],["6.2","Viết biên bản nghiệm thu giai đoạn 1 và danh sách bàn giao."],["N6","Nộp: Bài Capstone và hồ sơ dự án hoàn chỉnh.",true]],
+  7:[["7.1","Dùng AI soạn biên bản họp và báo cáo tuần từ ghi chú thô; nộp prompt, bản AI và bản bạn đã sửa."],["7.2","Viết chính sách dùng AI 1 trang cho team FreshGo, kèm bổ sung Definition of Done."],["7.3","Đánh giá CR “gợi ý sản phẩm bằng AI”: 5 câu hỏi, PoC 2 tuần, 3 phương án cho anh Minh."],["N7","Nộp: Thư viện 10 prompt PM + chính sách AI.",true]]
+};
+
+const CASES = [
+  {m:1,t:"“Code luôn đi em”",s:"Tuần đầu tiên, anh Minh muốn team bắt tay code ngay, bỏ qua tài liệu vì “tốn thời gian”.",h:"Đồng tình về tốc độ, nhưng giải thích bằng rủi ro: hợp đồng Fixed Price, nếu không chốt phạm vi thì mọi yêu cầu phát sinh đều thành tranh cãi. Đề xuất chỉ mất 1 tuần cho Charter và Scope gọn 5 trang, trong lúc đó dev dựng môi trường và làm thử (spike) API POS. Hai việc chạy song song nên không ai phải ngồi chờ."},
+  {m:2,t:"Ước lượng bị ép",s:"Sales đã hứa với khách là 6 tháng, nhưng WBS của bạn ra 7,5 tháng.",h:"Không tự cắt ước lượng cho vừa. Đưa 3 lựa chọn có số liệu: (a) cắt báo cáo doanh thu và app shipper sang giai đoạn 2; (b) thêm 1 backend dev, tốn thêm khoảng 250 triệu nhưng rủi ro phối hợp tăng; (c) giữ phạm vi, lùi ngày. Nên đề xuất (a), vì ngày 1/7 là mốc cứng."},
+  {m:3,t:"PO biến mất",s:"Chị Lan bỏ lỡ 2 buổi Sprint Review liên tiếp, team đang tự đoán thứ tự ưu tiên.",h:"Gặp riêng chị Lan, chỉ rõ hậu quả: team làm sai thứ tự thì tốn tiền của chính FreshMart. Đề xuất cách gọn hơn: Review 45 phút, refinement 30 phút mỗi tuần, và chị ủy quyền cho một quản lý cửa hàng trả lời câu hỏi hằng ngày. Nếu vẫn không được, ghi vào Risk Register và báo anh Minh."},
+  {m:5,t:"Khách hàng giận dữ",s:"Demo Sprint 4 bị lỗi thanh toán ngay trước mặt anh Minh. Anh nhắn: “Tôi bắt đầu nghi ngờ năng lực bên anh.”",h:"Trả lời trong ngày, không biện minh. Email gồm: nhận trách nhiệm; nguyên nhân gốc (sandbox của cổng thanh toán hết hạn token); đã khắc phục gì; làm gì để không tái diễn (thêm bước kiểm tra trước demo vào DoD); và đề nghị demo lại trong 48 giờ."},
+  {m:5,t:"Xung đột Dev và Tester",s:"Tester log 40 bug trong 2 ngày, dev cho rằng một nửa “không phải bug”. Hai bên cãi nhau trên nhóm chat chung.",h:"Đưa tranh luận ra khỏi nhóm chat. Họp 30 phút có BA và PO, dùng tiêu chí chấp nhận làm trọng tài. Phân loại lại thành Bug / Thay đổi yêu cầu / Không sửa. Gốc rễ là tiêu chí chấp nhận mơ hồ, nên cần thêm bước review tiêu chí vào refinement."},
+  {m:4,t:"Fresher nghỉ việc",s:"Tháng thứ 4, mobile dev fresher xin nghỉ với thời gian báo trước 2 tuần.",h:"Rủi ro đã thành issue. Ngay lập tức: lịch bàn giao code cho dev còn lại; đề nghị công ty điều người hoặc tuyển gấp; đánh giá lại velocity; báo khách hàng nếu ảnh hưởng mốc. Bài học: lẽ ra pair programming phải có từ đầu, theo đúng phương án trong Risk Register."}
+];
+
+const TESTS = {
+  1:{title:"Test 1 · Module 1–2", when:"Làm sau tuần 4", q:[
+    ["Việc nào dưới đây là một dự án?",["Sao lưu dữ liệu hằng đêm","Nâng cấp hệ thống POS lên phiên bản mới cho 30 cửa hàng","Trực helpdesk hỗ trợ người dùng","Vá lỗi bảo mật định kỳ hằng tháng"],1,"Nâng cấp POS có điểm đầu và cuối, tạo ra kết quả mới. Các lựa chọn còn lại là vận hành lặp đi lặp lại."],
+    ["FreshGo ký hợp đồng Fixed Price nhưng nhiều yêu cầu của app còn chưa rõ. Cách tiếp cận phù hợp nhất?",["Agile thuần, không cần chốt phạm vi","Waterfall thuần, cấm mọi thay đổi","Hybrid: chốt phạm vi và mốc ở mức tổng, làm theo Sprint, thay đổi đi qua Change Request","Hoãn ký hợp đồng đến khi yêu cầu rõ 100%"],2,"Fixed Price cần chốt phạm vi để bảo vệ bên làm; yêu cầu chưa rõ thì cần Sprint để có phản hồi sớm. Hybrid giải quyết cả hai."],
+    ["Tài liệu nào chính thức trao quyền cho PM sử dụng nguồn lực của tổ chức?",["Business Case","Project Charter","WBS","Scope Statement"],1,"Project Charter khai sinh dự án và trao quyền cho PM. Business Case chỉ chứng minh dự án đáng đầu tư."],
+    ["Giám đốc tài chính FreshMart có quyền dừng giải ngân nhưng ít quan tâm chi tiết dự án. Chiến lược phù hợp?",["Quản lý chặt, mời dự mọi cuộc họp","Giữ hài lòng: báo cáo ngắn, đúng lúc về ngân sách","Thông báo đầy đủ mọi chi tiết kỹ thuật","Chỉ theo dõi, không cần liên hệ"],1,"Quyền lực cao, quan tâm thấp → giữ hài lòng. Đừng làm họ ngợp, nhưng cũng đừng để họ bất ngờ."],
+    ["Mục tiêu nào đạt chuẩn SMART?",["Làm app thân thiện với người dùng","Tăng doanh thu online càng nhiều càng tốt","Giảm tỷ lệ sót đơn từ 8% xuống dưới 1% trong 3 tháng sau go-live","Hoàn thành dự án sớm nhất có thể"],2,"Chỉ lựa chọn này có con số đo được, mức mục tiêu và thời hạn cụ thể."],
+    ["Ước lượng ba điểm: lạc quan 4, khả năng cao nhất 7, bi quan 16 man-day. Kết quả PERT?",["7","8","9","9,5"],1,"(4 + 4×7 + 16) / 6 = 48 / 6 = 8. Nhớ nhân 4 cho giá trị khả năng cao nhất."],
+    ["“Quy tắc 100%” của WBS nghĩa là gì?",["Mọi gói việc phải xong 100% mới được tính","Các phần tử con cộng lại bằng đúng 100% công việc của cha, không thừa không thiếu","Team phải làm việc 100% công suất","100% gói việc phải có người phụ trách trước khi lập Gantt"],1,"Quy tắc 100% giúp WBS không bỏ sót và không chứa việc ngoài phạm vi."],
+    ["Khách hàng muốn go-live sớm 1 tuần. PM nên tập trung rút ngắn việc nào?",["Việc dễ làm nhất","Việc có nhiều thời gian dự trữ (float) nhất","Việc nằm trên đường găng, bằng cách thêm người hoặc làm song song","Cắt thời gian kiểm thử"],2,"Rút ngắn việc có float không làm dự án xong sớm hơn. Cắt test là đổi chất lượng lấy tiến độ, chỉ đẩy rủi ro ra sau."],
+    ["Với loại hợp đồng nào, rủi ro vượt chi phí chủ yếu thuộc về công ty phần mềm (bên làm)?",["Time & Material","Fixed Price","ODC (thuê team)","Cost Plus"],1,"Fixed Price: giá đã chốt, làm vượt công thì bên làm chịu."],
+    ["Dev ước lượng 20 ngày, nhưng sales đã hứa với khách 12 ngày. PM nên làm gì trước tiên?",["Yêu cầu dev cam kết 12 ngày","Xem lại ước lượng cùng dev, rồi đưa ra các phương án đánh đổi để các bên quyết định","Báo khách hàng là sales hứa sai","Làm thêm giờ để kịp"],1,"Vai trò của PM là đưa sự thật và các lựa chọn để các bên quyết định, không ép team hay đổ lỗi."]
+  ]},
+  2:{title:"Test 2 · Module 3–4", when:"Làm sau tuần 8", q:[
+    ["Ai chịu trách nhiệm sắp xếp thứ tự Product Backlog?",["Scrum Master","Product Owner","Project Manager","Developers"],1,"Theo Scrum Guide, PO chịu trách nhiệm tối đa giá trị sản phẩm, gồm cả việc sắp xếp Backlog."],
+    ["Daily Scrum được giới hạn trong bao lâu?",["15 phút","30 phút","1 giờ","Tùy team quyết"],0,"Daily Scrum luôn là 15 phút, bất kể Sprint dài bao lâu."],
+    ["Giữa Sprint, chị Lan đòi thêm ngay tính năng “mã giảm giá”. Scrum Master nên làm gì?",["Cho team làm ngay để khách vui","Từ chối thẳng vì Sprint đã khóa","Thêm vào Sprint Backlog và bảo team tăng ca","Hướng dẫn đưa yêu cầu vào Product Backlog để PO sắp xếp; không làm hỏng Sprint Goal đang chạy"],3,"Chỉ PO được thay đổi thứ tự ưu tiên, và thay đổi không được làm hỏng Sprint Goal. SM hướng dẫn quy trình, không tự nhận hay từ chối thay PO."],
+    ["Velocity 3 Sprint gần nhất: 24, 30, 27. Backlog còn 135 điểm. Cần thêm bao nhiêu Sprint?",["4","5","6","7"],1,"(24 + 30 + 27) / 3 = 27; 135 / 27 = 5 Sprint."],
+    ["User story nào đạt chuẩn INVEST tốt nhất?",["Xây dựng database cho hệ thống","Làm toàn bộ app shipper","Là khách hàng, tôi muốn lọc sản phẩm theo cửa hàng gần nhất để biết hàng còn sẵn","Tối ưu hiệu năng app"],2,"Có vai trò, giá trị rõ, đủ nhỏ và kiểm thử được. Các lựa chọn khác là task kỹ thuật hoặc quá lớn."],
+    ["Code review thuộc hoạt động nào?",["Đảm bảo chất lượng (QA)","Kiểm soát chất lượng (QC)","Kiểm thử chấp nhận (UAT)","Không thuộc loại nào"],0,"Code review là biện pháp quy trình để phòng lỗi, nên thuộc QA."],
+    ["Để phòng rủi ro “app bị Apple từ chối”, PM cho nộp sớm 2 tuần và rà kỹ guideline. Chiến lược gì?",["Tránh","Giảm","Chuyển giao","Chấp nhận"],1,"Hạ khả năng xảy ra và giảm ảnh hưởng nếu xảy ra → Giảm (Mitigate)."],
+    ["Hợp đồng với nhà cung cấp POS có điều khoản phạt nếu bàn giao API trễ. Chiến lược gì?",["Tránh","Giảm","Chuyển giao","Chấp nhận"],2,"Đẩy hậu quả tài chính sang bên thứ ba qua hợp đồng → Chuyển giao (Transfer)."],
+    ["Chị Lan nhắn Zalo: “Thêm nút chia sẻ sản phẩm, nhỏ thôi mà em.” PM nên làm gì?",["Bảo dev làm luôn vì việc nhỏ","Im lặng, đợi chị nhắc lại","Từ chối vì ngoài phạm vi","Ghi nhận, đánh giá tác động, rồi đưa qua Change Request hoặc Backlog trước khi làm"],3,"Mọi thay đổi, dù nhỏ, đều đi qua quy trình. “Nhỏ thôi mà” chính là gốc của phình phạm vi."],
+    ["Nhà cung cấp POS thông báo API đã bàn giao trễ 2 tuần. Với dự án, đây là gì?",["Rủi ro","Issue","Change Request","Giả định (assumption)"],1,"Việc đã xảy ra là issue. Nó có thể sinh ra rủi ro mới, ví dụ trễ mốc go-live."]
+  ]},
+  3:{title:"Test 3 · Module 5–6", when:"Làm sau tuần 12", q:[
+    ["Team mới ghép 3 tuần, bắt đầu tranh cãi về cách làm việc. Theo Tuckman, team đang ở giai đoạn nào?",["Hình thành (Forming)","Sóng gió (Storming)","Ổn định (Norming)","Hiệu quả cao (Performing)"],1,"Tranh cãi về vai trò và cách làm là dấu hiệu điển hình của giai đoạn Sóng gió."],
+    ["Báo cáo tuần gửi anh Minh (CEO, rất bận) nên như thế nào?",["1 trang: trạng thái RAG, tiến độ so với kế hoạch, rủi ro chính và quyết định cần anh đưa ra","Xuất toàn bộ danh sách task trên Jira","Chi tiết kỹ thuật của từng API","Chỉ báo cáo khi có vấn đề"],0,"Lãnh đạo cần biết dự án có ổn không và họ cần quyết định gì, đọc trong 2 phút."],
+    ["Cách xử lý xung đột nào thường cho kết quả bền vững nhất?",["Áp đặt","Né tránh","Nhường","Hợp tác, cùng giải quyết vấn đề"],3,"Hợp tác xử lý được gốc rễ và giữ được quan hệ, dù tốn thời gian hơn."],
+    ["Team phát hiện sẽ trễ 3 ngày nhưng tin là đuổi kịp được. Khách hàng là người Nhật. PM nên làm gì?",["Chưa báo, vì có thể đuổi kịp","Chờ đến buổi họp định kỳ tháng sau","Báo sớm ngay, kèm nguyên nhân và kế hoạch khắc phục","Báo trễ 5 ngày cho an toàn, rồi giao sớm"],2,"Khách Nhật cực kỳ coi trọng báo cáo sớm (hō-ren-sō). Bị bất ngờ mới là điều làm mất niềm tin, không phải việc trễ 3 ngày."],
+    ["Khách đòi thêm tính năng nhưng không chịu lùi ngày, không tăng tiền. Phản hồi nào tốt nhất?",["Đưa các phương án đánh đổi kèm số liệu, ví dụ đổi tính năng khác ra hoặc đưa vào bản 1.1","Đồng ý rồi âm thầm cho team tăng ca","Từ chối vì hợp đồng đã ký","Đồng ý nhưng giảm thời gian kiểm thử"],0,"Không nói “không” trống trơn. Đưa lựa chọn để khách tự quyết định với đầy đủ thông tin."],
+    ["PV = 500 triệu, EV = 400 triệu, AC = 450 triệu. SPI bằng bao nhiêu?",["0,80","0,89","1,13","1,25"],0,"SPI = EV / PV = 400 / 500 = 0,80. Dự án đang chậm tiến độ."],
+    ["Với số liệu câu 6, CPI bằng bao nhiêu và ý nghĩa là gì?",["1,13: tiết kiệm chi phí","0,89: vượt chi phí","0,80: vượt chi phí","1,00: đúng ngân sách"],1,"CPI = EV / AC = 400 / 450 ≈ 0,89: mỗi đồng chi ra chỉ tạo 0,89 đồng giá trị."],
+    ["BAC = 2,4 tỷ, CPI = 0,8. EAC là bao nhiêu?",["2,4 tỷ","2,88 tỷ","3,0 tỷ","3,2 tỷ"],2,"EAC = BAC / CPI = 2,4 / 0,8 = 3,0 tỷ."],
+    ["UAT đã đạt, khách dùng 2 tuần nhưng chưa ký nghiệm thu và liên tục đòi sửa nhỏ. PM nên làm gì?",["Tiếp tục sửa đến khi khách hài lòng","Dừng hỗ trợ để ép khách ký","Báo cáo dự án thất bại","Đối chiếu với tiêu chí nghiệm thu, tách bug với yêu cầu mới (Change Request), đề nghị ký biên bản kèm danh sách tồn đọng và cam kết bảo hành"],3,"Nghiệm thu dựa trên tiêu chí đã thống nhất. Danh sách tồn đọng và cam kết bảo hành giúp cả hai bên yên tâm ký."],
+    ["Mục đích chính của Lessons Learned là gì?",["Tìm người chịu trách nhiệm cho các lỗi","Ghi lại điều làm tốt và chưa tốt để dự án sau áp dụng, không đổ lỗi","Đánh giá hiệu suất cá nhân để xét thưởng","Hoàn thiện hồ sơ thanh toán"],1,"Lessons Learned là để tổ chức học hỏi. Nếu thành buổi đổ lỗi, mọi người sẽ giấu vấn đề."]
+  ]},
+  4:{title:"Test 4 · Module 7 (AI)", when:"Làm sau tuần 13", q:[
+    ["AI soạn biên bản họp có câu “khách đồng ý lùi go-live 1 tuần”, nhưng bạn không nhớ có chuyện này. Bạn làm gì ĐẦU TIÊN?",["Gửi luôn vì AI đã đọc bản ghi","Xóa câu đó rồi gửi","Kiểm tra lại bản ghi hoặc hỏi người dự họp trước khi gửi","Hỏi lại AI xem có chắc không"],2,"Cam kết chỉ được ghi khi đã xác nhận với nguồn thật. Hỏi lại AI không phải là kiểm chứng."],
+    ["Prompt nào sẽ cho báo cáo tuần tốt nhất?",["Viết báo cáo tuần","Viết báo cáo tuần thật chuyên nghiệp","Bạn là PM… Bối cảnh FreshGo… Viết báo cáo 1 trang gửi CEO, trạng thái Vàng… không bịa số, thiếu thì ghi [CẦN BỔ SUNG]","Viết báo cáo tuần bằng tiếng Anh cho sang"],2,"Prompt đủ 5 phần: vai trò, bối cảnh, nhiệm vụ, định dạng, ràng buộc."],
+    ["Dev muốn dán file log có số điện thoại khách hàng vào chatbot miễn phí để nhờ debug. Phản hồi phù hợp nhất?",["Đồng ý vì chỉ là log","Che dữ liệu cá nhân hoặc dùng công cụ được công ty duyệt","Cấm team dùng AI từ nay","Báo cáo dev lên phòng nhân sự"],1,"Đây là xử lý dữ liệu cá nhân theo Luật Bảo vệ dữ liệu cá nhân 2025. Giải pháp cân bằng là che dữ liệu hoặc dùng công cụ được duyệt; cấm hoàn toàn khiến team lén dùng."],
+    ["“Hallucination” trong AI tạo sinh là gì?",["AI chạy chậm","AI tạo thông tin sai nhưng trình bày rất tự tin","AI từ chối trả lời","AI lặp lại câu hỏi"],1,"Đây là lý do mọi bản AI soạn đều cần người duyệt cuối."],
+    ["Team bắt đầu dùng AI viết code từ Sprint 6. Cách dự báo velocity hợp lý?",["Tăng ngay 50% vì AI viết nhanh","Giữ dự báo cũ, đo vài Sprint rồi mới điều chỉnh dựa trên số liệu thật","Bỏ velocity, chỉ hỏi cảm nhận team","Giảm 50% vì code AI nhiều lỗi"],1,"Chưa có dữ liệu thì chưa đổi dự báo. Code AI có thể tăng thời gian review và lỗi ẩn."],
+    ["Nên bổ sung gì vào Definition of Done khi team dùng AI hỗ trợ viết code?",["Không cần thay đổi","Code do AI hỗ trợ được review, có test, đã quét bảo mật","Cấm merge code do AI viết","Ghi tên công cụ AI vào từng dòng code"],1,"DoD áp dụng như nhau cho mọi code; nhấn mạnh review, test và bảo mật."],
+    ["Khách muốn thêm tính năng AI (gợi ý sản phẩm) vào hợp đồng Fixed Price đang chạy. Bước tiếp theo tốt nhất?",["Nhận luôn và hứa giữ ngày","Từ chối vì Fixed Price không đổi được","Hỏi về dữ liệu và mục tiêu, đề xuất PoC có timebox rồi đưa phương án qua Change Request","Giao team tự nghiên cứu ngoài giờ"],2,"Dự án AI khó ước lượng trước khi thử. PoC có tiêu chí đạt giúp nhà tài trợ quyết định dựa trên dữ liệu."],
+    ["Tiêu chí nghiệm thu nào phù hợp cho tính năng gợi ý sản phẩm bằng AI?",["AI phải luôn đúng","≥ 70% gợi ý được đánh giá liên quan trên bộ 200 khách thử","Khách hàng thấy hài lòng","Mô hình dùng công nghệ mới nhất"],1,"Kết quả AI mang tính xác suất nên tiêu chí cần dạng ngưỡng, đo được trên bộ dữ liệu thử thống nhất trước."],
+    ["Sau go-live, chất lượng gợi ý giảm dần vì thói quen mua hàng thay đổi. Hiện tượng này gọi là gì và cần làm gì?",["Scope creep; khóa phạm vi","Drift; giám sát chỉ số chất lượng và có kế hoạch cập nhật mô hình","Technical debt; viết lại toàn bộ","Hallucination; tắt tính năng"],1,"Drift là đặc thù của hệ thống AI; cần giám sát liên tục sau go-live, không chỉ nghiệm thu một lần."],
+    ["Nhà tuyển dụng hỏi “AI có thay thế PM không?”. Câu trả lời tốt nhất?",["Có, nên em học thêm lập trình","Không, AI chỉ là trò đùa","AI tự động phần soạn thảo, tổng hợp; PM giữ phần phán đoán, bên liên quan, chịu trách nhiệm. Em dùng AI có kiểm soát, ví dụ…","Em không dùng AI để giữ an toàn"],2,"Thể hiện hiểu biết cân bằng và có ví dụ thực tế là điều nhà tuyển dụng muốn nghe."]
+  ]}
+};
+
+const TEMPLATES = [
+  {id:"charter",t:"Mẫu 1 · Project Charter",note:"Checklist tự chấm: có “ngoài phạm vi”? Mục tiêu có số và hạn? Có quyền hạn của PM? Gọn trong 2 trang?",h:["Mục","Nội dung cần điền"],r:[["Tên dự án / Mã dự án",""],["Nhà tài trợ (Sponsor)","Người quyết định ngân sách, ký duyệt"],["Project Manager và quyền hạn","PM được tự quyết đến mức nào (tiền, người, phạm vi)"],["Bối cảnh và vấn đề","Vì sao cần dự án này"],["Mục tiêu (SMART)","2–4 mục tiêu đo được"],["Phạm vi","Trong phạm vi / Ngoài phạm vi"],["Sản phẩm bàn giao chính",""],["Mốc chính","Mốc – ngày – tiêu chí hoàn thành"],["Ngân sách tổng","Bao gồm dự phòng"],["Rủi ro cấp cao và giả định","3–5 mục"],["Bên liên quan chính",""],["Tiêu chí thành công",""],["Chữ ký phê duyệt","Sponsor – ngày"]]},
+  {id:"raci",t:"Mẫu 2 · Ma trận RACI",note:"R = làm · A = chịu trách nhiệm cuối cùng (mỗi dòng chỉ 1 A) · C = được hỏi ý kiến · I = được thông báo.",h:["Công việc","Sponsor","PO khách","PM","BA","Dev","Tester"],r:[["Duyệt Charter","A","C","R","I","I","I"],["Đặc tả yêu cầu","I","A","C","R","C","C"],["Ước lượng","I","I","A","C","R","R"],["UAT","I","A","C","R","I","R"],["Phát hành / Go-live","A","C","R","I","R","C"]]},
+  {id:"wbs",t:"Mẫu 3 · WBS và ước lượng",note:"Ước lượng = (O + 4M + P) / 6. Dán sang Excel rồi thêm công thức vào cột Ước lượng.",h:["Mã WBS","Gói công việc","Sản phẩm bàn giao","Người phụ trách","O","M","P","Ước lượng","Phụ thuộc"],r:[["1.0","Quản lý dự án","Kế hoạch, báo cáo","PM","","","","",""],["2.0","Phân tích yêu cầu","SRS, user stories","BA","","","","","1.0"],["2.1","Khảo sát nghiệp vụ cửa hàng","Biên bản khảo sát","BA","","","","",""],["3.0","Thiết kế","UI/UX, kiến trúc","","","","","","2.0"],["4.0","Phát triển","Mã nguồn","","","","","","3.0"],["5.0","Kiểm thử","Test case, báo cáo test","Tester","","","","","4.0"],["6.0","Triển khai & UAT","Biên bản UAT","PM","","","","","5.0"]]},
+  {id:"risk",t:"Mẫu 4 · Risk Register",note:"Điểm = KN × AH. Từ 15 trở lên là Đỏ (báo Sponsor), 8–14 là Vàng, dưới 8 là Xanh. Rà soát mỗi tuần.",h:["ID","Rủi ro (Nếu… thì…)","Nguyên nhân","KN (1–5)","AH (1–5)","Điểm","Chiến lược","Hành động ứng phó","Người phụ trách","Dấu hiệu cảnh báo","Trạng thái"],r:[["R01","Nếu API POS bàn giao trễ thì mốc tích hợp trễ 2–3 tuần","Tài liệu API thiếu, nhà cung cấp chậm","4","4","16","Giảm","Dùng mock API, họp kỹ thuật hằng tuần với nhà cung cấp","Backend lead","Quá 3 ngày không trả lời","Mở"],["R02","","","","","","","","","",""]]},
+  {id:"cr",t:"Mẫu 5 · Change Request",note:"Mọi thay đổi, kể cả “nhỏ thôi mà”, đều đi qua mẫu này trước khi làm.",h:["Mục","Nội dung"],r:[["Mã CR / Ngày / Người yêu cầu",""],["Mô tả thay đổi",""],["Lý do / giá trị kinh doanh",""],["Tác động phạm vi","Thêm, bớt hoặc sửa những gì"],["Tác động tiến độ","+/− bao nhiêu ngày, ảnh hưởng mốc nào"],["Tác động chi phí","Bao nhiêu man-day, bao nhiêu tiền"],["Tác động chất lượng / rủi ro",""],["Các phương án","A / B / C"],["Đề xuất của PM",""],["Quyết định","Duyệt / Từ chối / Hoãn – người ký – ngày"]]},
+  {id:"report",t:"Mẫu 6 · Báo cáo tuần (1 trang)",note:"Viết theo kết quả, không theo task. Lãnh đạo đọc trong 2 phút phải biết cần quyết định gì.",h:["Mục","Nội dung"],r:[["Trạng thái tổng","Xanh / Vàng / Đỏ, kèm 1 câu lý do"],["Tiến độ / Chi phí / Phạm vi","RAG từng mục; SPI và CPI nếu có"],["Đã xong tuần này","3–5 gạch đầu dòng"],["Kế hoạch tuần tới",""],["Rủi ro và vướng mắc","Top 3, kèm hành động đang làm"],["Cần quyết định / hỗ trợ","Ai, việc gì, hạn khi nào"]]},
+  {id:"story",t:"Mẫu 7 · User Story",note:"Ưu tiên theo MoSCoW: Must / Should / Could / Won't.",h:["Trường","Nội dung"],r:[["Mã & tên story",""],["Epic",""],["Điểm / Ưu tiên","… / Must · Should · Could"],["Story","Là [vai trò], tôi muốn [hành động] để [lợi ích]"],["Tiêu chí 1","Given … When … Then …"],["Tiêu chí 2","Given … When … Then …"],["Ghi chú / thiết kế","Link Figma"]]},
+  {id:"dod",t:"Mẫu 8 · Definition of Done",note:"Điểm khởi đầu, team chỉnh lại cho hợp với mình ở buổi Retro.",h:["#","Tiêu chí"],r:[["1","Code đã được ít nhất 1 người review và merge"],["2","Unit test đạt, coverage ≥ 70% cho phần code mới"],["3","Đạt toàn bộ tiêu chí chấp nhận; tester đã xác nhận"],["4","Không còn bug Critical hoặc High"],["5","Đã deploy lên staging và PO đã xem"],["6","Đã cập nhật tài liệu (API, hướng dẫn nếu có)"]]},
+  {id:"retro",t:"Mẫu 9 · Sprint Retrospective",note:"Tối đa 2 hành động mỗi Sprint. Mở đầu Retro sau bằng việc kiểm tra 2 hành động lần trước.",h:["Điều gì tốt","Điều gì chưa tốt","Hành động cải tiến","Người phụ trách","Hạn"],r:[["","","","",""]]},
+  {id:"close",t:"Mẫu 10 · Nghiệm thu và Lessons Learned",note:"Không đóng dự án khi chưa có chữ ký nghiệm thu.",h:["Mục","Nội dung"],r:[["Hạng mục nghiệm thu","Theo hợp đồng / Charter"],["Kết quả UAT","Số test case đạt / tổng; link báo cáo"],["Danh sách tồn đọng","Lỗi nhỏ chấp nhận được, hạn khắc phục"],["Tài sản bàn giao","Source code, tài liệu, tài khoản, license"],["Bảo hành","Thời hạn, phạm vi, kênh hỗ trợ"],["Chữ ký","Đại diện hai bên – ngày"],["LL: nên tiếp tục",""],["LL: nên thay đổi",""],["LL: khuyến nghị cho dự án sau",""]]}
+];
+
+const GLOSSARY = [
+  ["ROI / Payback","Tỷ suất hoàn vốn / Thời gian hoàn vốn","Dự án đem lại bao nhiêu so với vốn bỏ ra, và bao lâu thì thu hồi vốn"],
+  ["Benefits realization","Hiện thực hóa lợi ích","Đo KPI kinh doanh sau go-live để chứng minh dự án có giá trị"],
+  ["RFP / Presales","Hồ sơ mời chào giá / Giai đoạn trước bán","Khách gửi yêu cầu; công ty ước lượng, báo giá, viết đề xuất"],
+  ["Gross margin","Biên lợi nhuận gộp","(Giá − chi phí) ÷ giá"],
+  ["Steering Committee","Ban chỉ đạo","Lãnh đạo các bên, quyết các việc vượt quyền PM"],
+  ["PMO","Văn phòng quản lý dự án","Đặt quy trình, mẫu biểu, tổng hợp báo cáo các dự án"],
+  ["SLA","Cam kết mức dịch vụ","Thời gian phản hồi, khắc phục, độ sẵn sàng mà nhà cung cấp cam kết"],
+  ["CI/CD","Tích hợp và triển khai liên tục","Build, test, triển khai tự động mỗi khi merge code"],
+  ["Rollback","Quay lui","Quay về phiên bản cũ khi bản mới gặp lỗi"],
+  ["Generative AI (GenAI)","AI tạo sinh","AI tạo ra văn bản, code, hình ảnh từ yêu cầu (prompt)"],
+  ["Prompt","Câu lệnh cho AI","Gồm vai trò, bối cảnh, nhiệm vụ, định dạng, ràng buộc"],
+  ["Hallucination","Ảo giác AI","AI tạo thông tin sai nhưng trình bày rất tự tin"],
+  ["Human-in-the-loop","Con người duyệt cuối","Mọi kết quả AI được người kiểm tra trước khi dùng"],
+  ["PoC (Proof of Concept)","Thử nghiệm khái niệm","Thử nhanh có giới hạn thời gian để biết ý tưởng có khả thi"],
+  ["Model drift","Mô hình suy giảm","Chất lượng AI giảm dần khi dữ liệu thực tế thay đổi"],
+  ["Project Charter","Điều lệ dự án","Giấy khai sinh dự án: mục tiêu, phạm vi, người chịu trách nhiệm"],
+  ["Scope / Scope creep","Phạm vi / Phình phạm vi","Việc làm và không làm; yêu cầu phình dần không kiểm soát"],
+  ["Stakeholder","Bên liên quan","Ai ảnh hưởng hoặc bị ảnh hưởng bởi dự án"],
+  ["Milestone","Mốc quan trọng","Điểm kiểm tra lớn, ví dụ bàn giao bản beta"],
+  ["WBS","Cấu trúc phân rã công việc","Chia dự án thành gói việc nhỏ đến mức giao được"],
+  ["Man-day / Man-month","Ngày công / Tháng công","Đơn vị ước lượng công sức, dùng để báo giá outsource"],
+  ["Critical Path","Đường găng","Chuỗi việc dài nhất; trễ là trễ cả dự án"],
+  ["RACI","Ma trận trách nhiệm","Ai làm, ai chịu trách nhiệm, ai được hỏi, ai được báo"],
+  ["Fixed Price / T&M","Trọn gói / Theo công","Ai chịu rủi ro vượt chi phí"],
+  ["Product Backlog","Danh sách tồn đọng sản phẩm","Mọi thứ sản phẩm cần, xếp theo ưu tiên"],
+  ["Sprint / Increment","Vòng lặp / Phần tăng trưởng","Chu kỳ 1–4 tuần; phần sản phẩm dùng được sau mỗi chu kỳ"],
+  ["WIP limit","Giới hạn việc đang làm","Số việc tối đa trong một cột Kanban"],
+  ["User Story","Câu chuyện người dùng","Yêu cầu viết từ góc nhìn người dùng"],
+  ["Acceptance Criteria","Tiêu chí chấp nhận","Điều kiện để một story được coi là xong"],
+  ["Definition of Done","Định nghĩa hoàn thành","Tiêu chuẩn chung áp cho mọi hạng mục"],
+  ["Risk Register","Sổ đăng ký rủi ro","Bảng theo dõi rủi ro, điểm số và cách ứng phó"],
+  ["Change Request","Yêu cầu thay đổi","Đề xuất thay đổi kèm đánh giá tác động"],
+  ["Story Point / Velocity","Điểm story / Tốc độ","Độ lớn tương đối của việc; số điểm team làm được mỗi Sprint"],
+  ["Burndown chart","Biểu đồ đốt công việc","Việc còn lại theo ngày trong Sprint"],
+  ["UAT","Kiểm thử chấp nhận người dùng","Khách hàng kiểm tra trước khi nghiệm thu"],
+  ["RAG","Đỏ – Vàng – Xanh","Cách báo trạng thái dự án nhanh cho lãnh đạo"],
+  ["EVM (PV, EV, AC)","Quản lý giá trị thu được","Đo tiến độ và chi phí bằng cùng một đơn vị tiền"],
+  ["SPI / CPI","Chỉ số tiến độ / chi phí","Dưới 1 là chậm / vượt chi phí"],
+  ["Retrospective","Buổi nhìn lại","Team tự cải tiến cách làm sau mỗi Sprint"],
+  ["Lessons Learned","Bài học kinh nghiệm","Tổng kết khi đóng dự án"]
+];
+
+/* ===================== TIẾN ĐỘ (lưu trong trình duyệt) ===================== */
+const KEY = "qlda-progress-v1";
+let P = { s:{}, e:{}, t:{} };
+try { const raw = localStorage.getItem(KEY); if (raw) P = Object.assign(P, JSON.parse(raw)); } catch (e) {}
+const COURSE_SLUG = "qlda-cntt";
+const ACC = document.createElement("div"); ACC.id = "account-slot"; ACC.style.padding = "0 8px";
+let accMounted = false;
+function save() { try { localStorage.setItem(KEY, JSON.stringify(P)); } catch (e) {} if (window.Platform) Platform.saveProgress(COURSE_SLUG, P); }
+function mergeProgress(r) {
+  if (!r) return;
+  ["s","e"].forEach(k => Object.entries(r[k] || {}).forEach(([id,v]) => { if (v) P[k][id] = true; }));
+  Object.entries(r.t || {}).forEach(([id,v]) => { if (P.t[id] == null || v > P.t[id]) P.t[id] = v; });
+}
+
+/* ===================== TIỆN ÍCH ===================== */
+const $ = (s, r=document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const fmt = (n, d=2) => Number.isFinite(n) ? n.toLocaleString("vi-VN",{minimumFractionDigits:d, maximumFractionDigits:d}) : "–";
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(()=>t.classList.remove("show"), 1800); }
+function sessionsOf(m) { return SESSIONS.filter(s => s[1] === m); }
+function modProgress(m) {
+  const ss = sessionsOf(m), ex = EXERCISES[m];
+  const total = ss.length + ex.length;
+  const done = ss.filter(s => P.s[s[0]]).length + ex.filter(x => P.e[x[0]]).length;
+  return { done, total };
+}
+function overall() {
+  const sd = SESSIONS.filter(s => P.s[s[0]]).length;
+  const all = Object.values(EXERCISES).flat();
+  const ed = all.filter(x => P.e[x[0]]).length;
+  const tp = Object.keys(TESTS).filter(k => (P.t[k] ?? -1) >= 7).length;
+  return { sd, st: SESSIONS.length, ed, et: all.length, tp, tt: Object.keys(TESTS).length };
+}
+function statusPill(done, total) {
+  if (done === 0) return `<span class="pill">Chưa bắt đầu</span>`;
+  if (done >= total) return `<span class="pill done">Hoàn thành</span>`;
+  return `<span class="pill part">${done}/${total}</span>`;
+}
+
+/* ===================== ĐIỀU HƯỚNG ===================== */
+const ROUTES = [
+  {g:"Bắt đầu", items:[["home","Tổng quan",""],["lo-trinh","Lộ trình 26 buổi",""]]},
+  {g:"Giáo trình", items: MODULES.map(m => ["m"+m.id, m.title.split(":")[0], "M"+m.id])},
+  {g:"Thực hành", items:[["bai-tap","Bài tập",""],["tinh-huong","6 tình huống",""],["capstone","Capstone",""]]},
+  {g:"Kiểm tra", items:[["test-1","Test 1","M1–2"],["test-2","Test 2","M3–4"],["test-3","Test 3","M5–6"],["test-4","Test 4","M7 · AI"]]},
+  {g:"Công cụ", items:[["bieu-mau","Biểu mẫu",""],["thuat-ngu","Thuật ngữ",""]]},
+  {g:"Đáp án & Tham khảo", items:[["dap-an","Đáp án bài tập",""],["dap-an-capstone","Đáp án Capstone",""],["cheat-sheet","Cheat sheet",""],["phong-van","Phỏng vấn",""],["ho-so","CV & Portfolio",""]]}
+];
+const ICON = {
+  chev: '<svg class="i chev" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5l5 5-5 5"/></svg>'
+};
+const OPEN_MODS = new Set();
+const SIDE_TAB = { tab: "learn", route: null };
+function currentLesson() { const h = (location.hash || "#home").slice(1); return /^b\d+$/.test(h) ? +h.slice(1) : null; }
+function renderNav(active) {
+  const h = (location.hash || "#home").slice(1);
+  const cur = currentLesson();
+  const curMod = cur ? SESSIONS[cur-1][1] : (/^m[1-7]$/.test(h) ? +h[1] : null);
+  if (curMod) OPEN_MODS.add(curMod);
+  const o = overall();
+  const pct = Math.round((o.sd + o.ed) / (o.st + o.et) * 100);
+  const link = (id, label, tag) => `<a href="#${id}" class="nv ${id===active && !cur ? "active" : ""}" ${id===active && !cur ? 'aria-current="page"' : ""}><span>${esc(label)}</span>${tag ? `<span class="tag">${esc(tag)}</span>` : ""}</a>`;
+  const mods = MODULES.map(m => {
+    const ss = sessionsOf(m.id), done = ss.filter(s => P.s[s[0]]).length, open = OPEN_MODS.has(m.id);
+    return `<div class="mod ${open ? "open" : ""}">
+      <button class="mod-head" data-tmod="${m.id}" aria-expanded="${open}"><span class="mod-code">M${m.id}</span><span class="mod-name">${esc(m.title.split(":")[0])}</span><span class="mod-meta">${done}/${ss.length}${ICON.chev}</span></button>
+      <div class="mod-body">
+        <a href="#m${m.id}" class="ses ov ${h === "m"+m.id ? "cur" : ""}"><span></span><span>Tổng quan module · ${esc(m.weeks)}</span></a>
+        ${ss.map(s => `<a href="#b${s[0]}" class="ses ${P.s[s[0]] ? "done" : ""} ${cur === s[0] ? "cur" : ""}" ${cur === s[0] ? 'aria-current="page"' : ""}><span class="dot">${P.s[s[0]] ? "✓" : s[0]}</span><span>${esc(s[3])}</span></a>`).join("")}
+      </div></div>`;
+  }).join("");
+  const PRACTICE = ["bai-tap","tinh-huong","capstone","test-1","test-2","test-3","test-4"];
+  const DOCS = ["dap-an","dap-an-capstone","cheat-sheet","phong-van","ho-so","bieu-mau","thuat-ngu"];
+  const auto = (PRACTICE.includes(active) || h === "capstone") ? "practice" : (DOCS.includes(active) || /^dap-an/.test(h)) ? "docs" : "learn";
+  if (SIDE_TAB.route !== h) { SIDE_TAB.tab = auto; SIDE_TAB.route = h; }
+  const tab = SIDE_TAB.tab;
+  const exDone = Object.values(EXERCISES).flat().filter(x => P.e[x[0]]).length, exAll = Object.values(EXERCISES).flat().length;
+  const item = (id, label, sub, right) => `<a href="#${id}" class="nv tall ${id===active && !cur ? "active" : ""}" ${id===active && !cur ? 'aria-current="page"' : ""}><span class="nvt"><span>${esc(label)}</span>${sub ? `<small>${esc(sub)}</small>` : ""}</span>${right ? `<span class="tag">${esc(right)}</span>` : ""}</a>`;
+  const testChip = k => { const sc = P.t[k], on = active === "test-"+k; return `<a href="#test-${k}" class="tchip ${on ? "on" : ""} ${sc != null ? (sc >= 7 ? "pass" : "fail") : ""}"><b>Test ${k}</b><span>${sc != null ? sc + "/10" : ({1:"M1–2",2:"M3–4",3:"M5–6",4:"M7 · AI"})[k]}</span></a>`; };
+  const panels = {
+    learn: `<div class="nvgroup">${link("home","Tổng quan")}${link("lo-trinh","Lộ trình 26 buổi")}</div>
+      <div class="nvgroup"><div class="nvlabel">7 module · 26 buổi</div>${mods}</div>`,
+    practice: `<div class="nvgroup"><div class="nvlabel">Thực hành</div>
+        ${item("bai-tap","Bài tập theo module", exDone + "/" + exAll + " bài đã làm")}
+        ${item("tinh-huong","6 tình huống thực tế","Tự xử lý rồi xem gợi ý")}
+        ${item("capstone","Capstone: Cứu dự án FreshGo","Bài cuối khóa · 30% điểm")}</div>
+      <div class="nvgroup"><div class="nvlabel">Kiểm tra · đạt từ 7/10</div><div class="tchips">${["1","2","3","4"].map(testChip).join("")}</div></div>`,
+    docs: `<div class="nvgroup"><div class="nvlabel">Đáp án</div>${item("dap-an","Đáp án bài tập","M1–M7, có tiêu chí tự chấm")}${item("dap-an-capstone","Đáp án Capstone","Lời giải và memo mẫu")}</div>
+      <div class="nvgroup"><div class="nvlabel">Sẵn sàng đi làm</div>${item("phong-van","Phỏng vấn","Câu hỏi và gợi ý trả lời")}${item("ho-so","CV & Portfolio","CV, portfolio, 30-60-90")}</div>
+      <div class="nvgroup"><div class="nvlabel">Công cụ</div>${item("cheat-sheet","Cheat sheet","Công thức trên 1 trang")}${item("bieu-mau","Biểu mẫu","10 mẫu dùng ngay")}${item("thuat-ngu","Thuật ngữ","Anh – Việt")}</div>`
+  };
+  const tabBtn = (k, label) => `<button role="tab" class="stab ${tab===k ? "on" : ""}" aria-selected="${tab===k}" data-stab="${k}">${label}</button>`;
+  $("#nav").innerHTML = `
+    <div class="course-card"><div class="t">Quản lý dự án CNTT thực chiến</div><div class="s">${o.sd}/${o.st} buổi · ${o.ed}/${o.et} bài tập · ${pct}%</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="stabs" role="tablist" aria-label="Nhóm mục lục">${tabBtn("learn","Bài học")}${tabBtn("practice","Luyện tập")}${tabBtn("docs","Tài liệu")}</div>
+    <div class="spanel-nav" role="tabpanel">${panels[tab]}</div>`;
+}
+
+function pageHome() {
+  const o = overall();
+  const next = SESSIONS.find(s => !P.s[s[0]]);
+  const pct = Math.round((o.sd + o.ed) / (o.st + o.et) * 100);
+  return `
+  <header class="head">
+    <div class="eyebrow">CHƯƠNG TRÌNH 13 TUẦN · 7 MODULE · 26 BUỔI</div>
+    <h1>Quản lý dự án CNTT thực chiến</h1>
+    <p class="lead">Dành cho Dev, Tester, BA muốn chuyển sang làm PM hoặc Scrum Master và áp dụng ngay vào dự án đang làm. Mọi bài tập xoay quanh một dự án giả định: app giao hàng FreshGo.</p>
+  </header>
+  <section class="grid3">
+    <div class="card stat"><div class="num">${pct}%</div><div class="cap">Tiến độ chung</div><div class="bar"><i style="width:${pct}%"></i></div></div>
+    <div class="card stat"><div class="num">${o.sd}/${o.st}</div><div class="cap">Buổi học đã xong</div></div>
+    <div class="card stat"><div class="num">${o.ed}/${o.et}</div><div class="cap">Bài tập đã làm</div></div>
+    <div class="card stat"><div class="num">${o.tp}/${o.tt}</div><div class="cap">Bài test đã đạt (≥ 7/10)</div></div>
+  </section>
+  ${next ? `<section class="card"><div class="eyebrow">HỌC TIẾP</div><h2>Buổi ${next[0]}: ${esc(next[3])}</h2><p class="lead">Tuần ${next[2]} · Module ${next[1]} · Bài tập: ${esc(next[4])}</p><div class="row"><a class="btn" href="#b${next[0]}" style="text-decoration:none">Vào bài giảng buổi ${next[0]}</a><a class="btn ghost" href="#lo-trinh" style="text-decoration:none">Xem lộ trình</a></div></section>` : `<section class="card"><h2>Bạn đã hoàn thành cả 26 buổi.</h2><p>Hãy làm Capstone và nhờ Claude soạn bài thi cuối khóa 40 câu.</p></section>`}
+  <section class="section">
+    <h2>7 module</h2>
+    <div class="modlist">${MODULES.map(m => { const p = modProgress(m.id); return `<a class="modrow" href="#m${m.id}"><span class="code">M${m.id}</span><span><b>${esc(m.title)}</b><br><span class="sub">${m.weeks} · Buổi ${sessionsOf(m.id)[0][0]}–${sessionsOf(m.id).slice(-1)[0][0]}</span></span>${statusPill(p.done,p.total)}</a>`; }).join("")}</div>
+  </section>
+  <section class="card" style="border-color:var(--accent)"><div class="eyebrow">ĐÁP ÁN & SẴN SÀNG ĐI LÀM</div><h2>Đáp án mẫu, phỏng vấn, CV & portfolio</h2><p class="lead">Đáp án chi tiết cho mọi bài tập và Capstone, cheat sheet công thức, ngân hàng câu hỏi phỏng vấn có gợi ý trả lời, cách viết CV chuyển ngành và kế hoạch 90 ngày đầu làm PM.</p><div class="row"><a class="btn" href="#dap-an" style="text-decoration:none">Xem đáp án</a><a class="btn ghost" href="#phong-van" style="text-decoration:none">Luyện phỏng vấn</a><a class="btn ghost" href="#ho-so" style="text-decoration:none">CV & Portfolio</a></div></section>
+  <section class="grid2">
+    <div class="card"><h3>Dự án FreshGo</h3>
+      <div class="tablewrap"><table><tbody>
+      <tr><td>Khách hàng</td><td>Chuỗi FreshMart, 30 cửa hàng thực phẩm sạch</td></tr>
+      <tr><td>Sản phẩm</td><td>App khách hàng, web quản trị cửa hàng, app shipper</td></tr>
+      <tr><td>Ngân sách</td><td class="num">2,4 tỷ đồng · Fixed Price</td></tr>
+      <tr><td>Thời gian</td><td class="num">6 tháng · go-live 1/7</td></tr>
+      <tr><td>Đội</td><td>PM (bạn), BA, 2 mobile, 2 backend, 1 frontend, 1 tester</td></tr>
+      <tr><td>Nhà tài trợ</td><td>Anh Minh, CEO: bận, chỉ đọc báo cáo ngắn</td></tr>
+      <tr><td>PO phía khách</td><td>Chị Lan, GĐ vận hành: hay thêm yêu cầu, ~4 giờ/tuần</td></tr>
+      </tbody></table></div>
+    </div>
+    <div class="card"><h3>Đánh giá cuối khóa</h3>
+      <div class="tablewrap"><table><thead><tr><th>Thành phần</th><th>Tỷ trọng</th></tr></thead><tbody>
+      <tr><td>4 bài test (10 câu mỗi bài)</td><td class="num">20%</td></tr>
+      <tr><td>7 sản phẩm module (★)</td><td class="num">30%</td></tr>
+      <tr><td>Thi cuối khóa (40 câu, 60 phút)</td><td class="num">20%</td></tr>
+      <tr><td>Capstone: cứu dự án FreshGo</td><td class="num">30%</td></tr>
+      </tbody></table></div>
+      <p class="lead" style="font-size:.9rem">Đạt khi tổng từ 70/100 và nộp đủ 7 sản phẩm. Tiến độ được lưu trong trình duyệt này.</p>
+    </div>
+  </section>`;
+}
+
+function pageRoadmap() {
+  let rows = "";
+  MODULES.forEach(m => {
+    rows += `<tr class="modsep"><td colspan="5">M${m.id} · ${esc(m.title)} · ${m.weeks}</td></tr>`;
+    sessionsOf(m.id).forEach(s => {
+      rows += `<tr><td><label class="check ${P.s[s[0]]?"is-done":""}"><input type="checkbox" data-s="${s[0]}" ${P.s[s[0]]?"checked":""} aria-label="Đã học buổi ${s[0]}"><span class="mono">${s[0]}</span></label></td><td class="num">T${s[2]}</td><td><a href="#b${s[0]}">${esc(s[3])}</a></td><td>${s[4].startsWith("Nộp")?`<span class="deliver">${esc(s[4])}</span>`:esc(s[4])}</td><td><button class="linkbtn" data-pdf="${PDF_IDS[s[0]-1]}" data-name="QLDA-CNTT_Buoi-${String(s[0]).padStart(2,"0")}.pdf" aria-label="Tải PDF buổi ${s[0]}">Tải</button></td></tr>`;
+    });
+  });
+  return `<header class="head"><div class="eyebrow">LỘ TRÌNH</div><h1>26 buổi trong 13 tuần</h1><p class="lead">Mỗi tuần 2 buổi, mỗi buổi khoảng 2,5 giờ, cộng 2–3 giờ bài tập. Tick ô khi học xong một buổi.</p></header>
+  ${pdfCard(PDF_FULL, "QLDA-CNTT_Giao-trinh-toan-khoa.pdf", "Giáo trình toàn khóa (PDF)", "75 trang A4: bìa, mục lục, đủ 26 buổi. Mỗi buổi cũng có PDF riêng trong trang bài giảng.")}
+  <div class="tablewrap"><table><thead><tr><th>Buổi</th><th>Tuần</th><th>Chủ đề</th><th>Bài tập (FreshGo)</th><th>PDF</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function exerciseList(m) {
+  return `<div class="section">${EXERCISES[m].map(([id,txt,del]) => `<label class="check ${P.e[id]?"is-done":""}"><input type="checkbox" data-e="${id}" ${P.e[id]?"checked":""}><span class="${del?"deliver":""}"><span class="mono">${id}</span> · ${esc(txt)}</span></label>`).join("")}<p style="font-size:.9rem"><a href="#dap-an-${m}">Xem đáp án mẫu Module ${m} →</a> <span class="lead" style="font-size:.85rem">(nên tự làm trước)</span></p></div>`;
+}
+
+/* ===================== ĐÁP ÁN & THAM KHẢO ===================== */
+function pageAnswerHub() {
+  return `<header class="head"><div class="eyebrow">ĐÁP ÁN & THAM KHẢO</div><h1>Đáp án mẫu bài tập</h1><p class="lead">Mỗi bài có: cách làm và tiêu chí tự chấm, đáp án mẫu chi tiết (bấm để mở), và lỗi hay gặp. Hãy tự làm trước rồi mới so sánh: giá trị nằm ở chỗ bạn thấy mình khác đáp án mẫu ở đâu và vì sao.</p></header>
+  <div class="modlist">${MODULES.map(m => `<a class="modrow" href="#dap-an-${m.id}"><span class="code">M${m.id}</span><span><b>${esc(m.title)}</b><br><span class="sub">${EXERCISES[m.id].length} bài · ${EXERCISES[m.id].map(x=>x[0]).join(", ")}</span></span><span class="pill">Xem</span></a>`).join("")}
+  <a class="modrow" href="#dap-an-capstone"><span class="code">★</span><span><b>Capstone: Cứu dự án FreshGo</b><br><span class="sub">Lời giải đầy đủ, memo mẫu, tự chấm theo rubric</span></span><span class="pill">Xem</span></a></div>
+  <section class="grid2">
+    <a class="card" href="#cheat-sheet" style="text-decoration:none;color:inherit"><h3>Cheat sheet</h3><p class="lead" style="font-size:.9rem">Toàn bộ công thức, giới hạn thời gian Scrum, chiến lược rủi ro, mẫu câu trên 1 trang.</p></a>
+    <a class="card" href="#phong-van" style="text-decoration:none;color:inherit"><h3>Ngân hàng câu hỏi phỏng vấn</h3><p class="lead" style="font-size:.9rem">${(window.INTERVIEW||[]).reduce((a,g)=>a+g.items.length,0)} câu có gợi ý trả lời, theo 8 nhóm, gồm cách trả lời theo STAR.</p></a>
+    <a class="card" href="#ho-so" style="text-decoration:none;color:inherit"><h3>CV, Portfolio, 30-60-90</h3><p class="lead" style="font-size:.9rem">Viết CV chuyển ngành, đóng gói portfolio, kế hoạch 90 ngày đầu khi làm PM.</p></a>
+  </section>`;
+}
+function pageAnswerModule(id) {
+  const m = MODULES.find(x => x.id === id), A = window.ANSWERS || {};
+  return `<header class="head"><div class="eyebrow"><a href="#dap-an" style="color:inherit;text-decoration:none">ĐÁP ÁN</a> · MODULE ${id}</div><h1>${esc(m.title)}</h1><p class="lead">Đáp án mẫu cho ${EXERCISES[id].length} bài tập. Đề bài gốc ở trang <a href="#m${id}">Module ${id}</a>.</p></header>
+  ${EXERCISES[id].map(([eid, txt, del]) => { const a = A[eid]; if (!a) return ""; return `
+  <section class="card">
+    <div class="eyebrow">${del?"★ SẢN PHẨM NỘP · ":"BÀI "}${eid}</div>
+    <h3>${esc(txt)}</h3>
+    <div class="hint"><b>Cách làm và tiêu chí tự chấm</b><ul>${a.how.map(h=>`<li>${esc(h)}</li>`).join("")}</ul></div>
+    <details class="case"><summary><span>Xem đáp án mẫu</span><span class="pill">Mở</span></summary><div class="body">${a.html}</div></details>
+    ${a.pitfalls && a.pitfalls.length ? `<div><b>Lỗi hay gặp</b><ul class="mistakes">${a.pitfalls.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>` : ""}
+  </section>`; }).join("")}
+  <nav class="pager">${id>1?`<a href="#dap-an-${id-1}">← Đáp án M${id-1}</a>`:"<a href=\"#dap-an\">← Tất cả đáp án</a>"}${id<6?`<a href="#dap-an-${id+1}">Đáp án M${id+1} →</a>`:`<a href="#dap-an-capstone">Đáp án Capstone →</a>`}</nav>`;
+}
+function pageCapstoneAnswer() {
+  return `<header class="head"><div class="eyebrow"><a href="#dap-an" style="color:inherit;text-decoration:none">ĐÁP ÁN</a> · CAPSTONE</div><h1>Lời giải mẫu: Cứu dự án FreshGo</h1><p class="lead">Đây là một lời giải tốt, không phải lời giải duy nhất. Bài của bạn có thể chọn phương án khác, miễn là có số liệu và lập luận rõ ràng. Đề bài ở trang <a href="#capstone">Capstone</a>.</p></header>
+  <details class="case" open><summary><span>Lời giải đầy đủ</span><span class="pill">Đóng / mở</span></summary><div class="body">${window.CAPSTONE_ANSWER || ""}</div></details>`;
+}
+function pageInterview() {
+  const G = window.INTERVIEW || [];
+  return `<header class="head"><div class="eyebrow">THAM KHẢO · ĐI LÀM</div><h1>Ngân hàng câu hỏi phỏng vấn PM / Scrum Master</h1><p class="lead">${G.reduce((a,g)=>a+g.items.length,0)} câu thường gặp, kèm gợi ý trả lời. Đừng học thuộc: hãy thay ví dụ bằng câu chuyện thật của bạn. Muốn luyện, hãy gõ vào chat: “Phỏng vấn thử tôi vị trí Junior PM, hỏi từng câu và chấm điểm.”</p></header>
+  <section class="callout"><b>Công thức STAR</b> cho câu hỏi hành vi: <b>S</b>ituation (bối cảnh, 1–2 câu) → <b>T</b>ask (trách nhiệm của bạn) → <b>A</b>ction (bạn đã làm gì; dùng “em/tôi”, không dùng “chúng em”) → <b>R</b>esult (kết quả có con số và bài học). Mỗi câu trả lời khoảng 1,5–2 phút.</section>
+  ${G.map(g => `<section class="section"><h2>${esc(g.g)}</h2>${g.items.map((it,i)=>`<details class="case"><summary><span>${esc(it[0])}</span><span class="pill">Gợi ý</span></summary><div class="body"><div class="hint">${it[1]}</div></div></details>`).join("")}</section>`).join("")}`;
+}
+function pageCareer() {
+  return `<header class="head"><div class="eyebrow">THAM KHẢO · ĐI LÀM</div><h1>CV, Portfolio và 90 ngày đầu làm PM</h1><p class="lead">Biến 13 tuần học thành hồ sơ ứng tuyển: chọn đúng vị trí, viết CV theo góc nhìn quản lý, dùng case study FreshGo làm portfolio, và chuẩn bị cho 90 ngày đầu tiên.</p></header>${window.CAREER_HTML || ""}`;
+}
+function pageCheat() {
+  return `<header class="head"><div class="eyebrow">THAM KHẢO</div><h1>Cheat sheet Quản lý dự án CNTT</h1><p class="lead">Toàn bộ công thức và quy tắc cần nhớ trên một trang. Ôn nhanh trước khi thi hoặc trước khi đi phỏng vấn.</p></header>${window.CHEAT_HTML || ""}`;
+}
+
+function toolPert() {
+  return `<section class="card calc" id="pert"><h3>Máy tính ước lượng ba điểm (PERT)</h3>
+  <div class="fields">
+    <label for="po">Lạc quan (O)<input id="po" type="number" min="0" step="0.5" value="10"></label>
+    <label for="pm">Khả năng cao nhất (M)<input id="pm" type="number" min="0" step="0.5" value="15"></label>
+    <label for="pp">Bi quan (P)<input id="pp" type="number" min="0" step="0.5" value="32"></label>
+  </div>
+  <div class="results" id="pert-out"></div></section>`;
+}
+function calcPert() {
+  const o = +$("#po").value, m = +$("#pm").value, p = +$("#pp").value;
+  const e = (o + 4*m + p) / 6, sd = (p - o) / 6;
+  $("#pert-out").innerHTML = `<div class="res"><b>${fmt(e,1)}</b><span>Ước lượng E (man-day)</span></div><div class="res"><b>${fmt(sd,1)}</b><span>Độ lệch chuẩn (P − O) / 6</span></div><div class="res"><b>${fmt(e+2*sd,1)}</b><span>Mức an toàn ~95% (E + 2σ)</span></div>`;
+}
+function toolEvm() {
+  return `<section class="card calc" id="evm"><h3>Máy tính EVM</h3><p class="lead" style="font-size:.9rem">Nhập cùng một đơn vị (tỷ hoặc triệu). Mặc định là số liệu FreshGo cuối tháng 3.</p>
+  <div class="fields">
+    <label for="bac">BAC (ngân sách)<input id="bac" type="number" step="0.01" value="2.4"></label>
+    <label for="pv">PV<input id="pv" type="number" step="0.01" value="1.2"></label>
+    <label for="ev">EV<input id="ev" type="number" step="0.01" value="1.0"></label>
+    <label for="ac">AC<input id="ac" type="number" step="0.01" value="1.1"></label>
+  </div>
+  <div class="results" id="evm-out"></div><p id="evm-say"></p></section>`;
+}
+function calcEvm() {
+  const bac=+$("#bac").value, pv=+$("#pv").value, ev=+$("#ev").value, ac=+$("#ac").value;
+  const spi = ev/pv, cpi = ev/ac, eac = bac/cpi, vac = bac - eac;
+  const cls = v => v < 1 ? "badv" : "goodv";
+  $("#evm-out").innerHTML = `<div class="res ${cls(spi)}"><b>${fmt(spi)}</b><span>SPI = EV / PV</span></div><div class="res ${cls(cpi)}"><b>${fmt(cpi)}</b><span>CPI = EV / AC</span></div><div class="res"><b>${fmt(eac)}</b><span>EAC = BAC / CPI</span></div><div class="res ${vac<0?"badv":"goodv"}"><b>${fmt(vac)}</b><span>VAC = BAC − EAC</span></div>`;
+  let say = "";
+  if (Number.isFinite(spi) && Number.isFinite(cpi)) {
+    const s = spi < 0.9 || cpi < 0.9 ? ["fail","Đỏ"] : (spi < 1 || cpi < 1 ? ["part","Vàng"] : ["pass","Xanh"]);
+    say = `Trạng thái gợi ý: <span class="verdict ${s[0]==="part"?"":s[0]}" style="${s[0]==="part"?"background:var(--marker-soft);color:var(--marker)":""}">${s[1]}</span> · ${spi<1?"chậm tiến độ":"đúng/nhanh tiến độ"}, ${cpi<1?"đang vượt chi phí":"trong ngân sách"}.`;
+  }
+  $("#evm-say").innerHTML = say;
+}
+
+function pageModule(id) {
+  const m = MODULES.find(x => x.id === id);
+  const prev = MODULES.find(x => x.id === id-1), next = MODULES.find(x => x.id === id+1);
+  return `<header class="head"><div class="eyebrow">MODULE ${m.id} · ${m.weeks.toUpperCase()}</div><h1>${esc(m.title)}</h1><p class="lead">${m.lead}</p></header>
+  <section class="section"><h2>Buổi học</h2>
+    <div class="tablewrap"><table><tbody>${sessionsOf(id).map(s => `<tr><td style="width:84px"><label class="check ${P.s[s[0]]?"is-done":""}"><input type="checkbox" data-s="${s[0]}" ${P.s[s[0]]?"checked":""} aria-label="Đã học buổi ${s[0]}"><span class="mono">B${s[0]}</span></label></td><td><a href="#b${s[0]}">${esc(s[3])}</a></td><td style="white-space:nowrap"><a href="#b${s[0]}">Vào bài →</a></td></tr>`).join("")}</tbody></table></div>
+  </section>
+  <section class="section"><h2>Ý cốt lõi</h2><ul>${m.core.map(c => `<li>${c}</li>`).join("")}</ul></section>
+  <section class="section"><h2>Ví dụ trên FreshGo</h2><div class="callout section">${m.example}</div></section>
+  ${m.tool === "pert" ? toolPert() : ""}${m.tool === "evm" ? toolEvm() : ""}
+  <section class="section"><h2>Lỗi thường gặp</h2><ul class="mistakes">${m.mistakes.map(x => `<li>${esc(x)}</li>`).join("")}</ul></section>
+  <section class="section"><h2>Bài tập module</h2>${exerciseList(id)}</section>
+  <section class="section"><h2>Đọc thêm (tiếng Việt)</h2><ul>${m.reading.map(([t,u]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul></section>
+  <section class="card"><div class="row" style="justify-content:space-between"><span>Kiểm tra kiến thức module này trong <b>Test ${m.test}</b>.</span><a class="btn" href="#test-${m.test}" style="text-decoration:none">Làm Test ${m.test}</a></div></section>
+  <nav class="pager">${prev?`<a href="#m${prev.id}">← M${prev.id} ${esc(prev.title.split(":")[0])}</a>`:"<span></span>"}${next?`<a href="#m${next.id}">M${next.id} ${esc(next.title.split(":")[0])} →</a>`:`<a href="#capstone">Capstone →</a>`}</nav>`;
+}
+
+function pageExercises() {
+  return `<header class="head"><div class="eyebrow">THỰC HÀNH</div><h1>Bài tập theo module</h1><p class="lead">Mỗi module có 2–3 bài nhỏ và 1 sản phẩm nộp (★). Muốn được chấm, hãy dán bài vào chat với Claude.</p></header>
+  ${MODULES.map(m => `<section class="card"><h3>M${m.id} · ${esc(m.title)}</h3>${exerciseList(m.id)}</section>`).join("")}`;
+}
+
+function pageCases() {
+  return `<header class="head"><div class="eyebrow">THỰC HÀNH</div><h1>6 tình huống thực tế</h1><p class="lead">Tự viết cách xử lý trước (khoảng nửa trang), rồi mới mở gợi ý. Gợi ý là một hướng tốt, không phải đáp án duy nhất.</p></header>
+  <div class="section">${CASES.map((c,i) => `<details class="case"><summary><span>TH${i+1}: ${esc(c.t)}</span><span class="pill">M${c.m}</span></summary><div class="body"><p>${esc(c.s)}</p><details><summary style="cursor:pointer;color:var(--accent);font-weight:600">Xem gợi ý xử lý</summary><div class="hint" style="margin-top:8px">${esc(c.h)}</div></details></div></details>`).join("")}</div>`;
+}
+
+function pageCapstone() {
+  return `<header class="head"><div class="eyebrow">CAPSTONE · 30% ĐIỂM</div><h1>Cứu dự án FreshGo</h1><p class="lead">Ngày 15/4, bạn được điều về thay PM cũ vừa nghỉ việc. Trong 1 tuần, hãy trình anh Minh phương án đưa dự án về đích.</p></header>
+  <section class="grid2">
+    <div class="card"><h3>Tình trạng nhận bàn giao</h3><ul>
+      <li>Jira còn <span class="mono">210</span> story point; velocity 3 Sprint gần nhất: <span class="mono">22, 18, 20</span> (Sprint 2 tuần). Còn 5 Sprint trước 30/6.</li>
+      <li><span class="mono">PV = 1,7 · EV = 1,3 · AC = 1,6</span> tỷ (BAC 2,4 tỷ).</li>
+      <li>API POS mới tích hợp được 50%, nhà cung cấp trả lời chậm.</li>
+      <li>Không có Risk Register; 3 Change Request đã làm nhưng chưa ký.</li>
+      <li>Team mệt, 2 người đã làm thêm giờ 3 tuần liền. Chị Lan vẫn muốn có tích điểm trước 1/7.</li></ul></div>
+    <div class="card"><h3>Cần nộp</h3><ol>
+      <li>Chẩn đoán: SPI, CPI, EAC; dự báo ngày xong theo velocity; 5 nguyên nhân gốc.</li>
+      <li>Ít nhất 2 phương án có số liệu (phạm vi, ngày, chi phí, rủi ro) và phương án đề xuất.</li>
+      <li>Kế hoạch 30 ngày đầu: Risk Register mới, xử lý 3 CR chưa ký, kế hoạch cho team.</li>
+      <li>Slide 10 trang hoặc memo 2 trang trình anh Minh.</li></ol></div>
+  </section>
+  <section class="section"><h2>Rubric chấm (100 điểm)</h2><div class="tablewrap"><table><thead><tr><th>Tiêu chí</th><th>Điểm</th><th>Mức tốt trông như thế nào</th></tr></thead><tbody>
+    <tr><td>Chẩn đoán</td><td class="num">25</td><td>Tính đúng các chỉ số EVM; thấy 210 điểm ÷ velocity ~20 ≈ 10,5 Sprint, gấp đôi thời gian còn lại.</td></tr>
+    <tr><td>Phương án</td><td class="num">25</td><td>Có đánh đổi rõ ràng, cắt phạm vi theo giá trị (MoSCoW). Không chỉ “tăng ca”.</td></tr>
+    <tr><td>Số liệu & kế hoạch</td><td class="num">20</td><td>Mỗi phương án có ngày, tiền, điểm story cụ thể; Risk Register có người phụ trách.</td></tr>
+    <tr><td>Giao tiếp & con người</td><td class="num">15</td><td>Xử lý tình trạng team mệt; xử lý yêu cầu tích điểm của chị Lan khéo léo.</td></tr>
+    <tr><td>Trình bày</td><td class="num">15</td><td>CEO đọc trong 3 phút là hiểu và quyết được.</td></tr>
+  </tbody></table></div><p class="lead" style="font-size:.92rem">Mẹo: dùng máy tính EVM ở <a href="#m6">Module 6</a> để kiểm tra số liệu của bạn. Làm xong thì so với <a href="#dap-an-capstone">lời giải mẫu</a>.</p></section>
+  <section class="section"><h2>Thảo luận Capstone</h2><p class="lead" style="font-size:.92rem">Chia sẻ hướng làm, hỏi về rubric, góp ý bài của nhau.</p><div id="discuss" data-key="capstone"></div></section>`;
+}
+
+function pageTest(n) {
+  const T = TESTS[n], best = P.t[n];
+  return `<header class="head"><div class="eyebrow">KIỂM TRA · ${T.when.toUpperCase()}</div><h1>${T.title}</h1><p class="lead">10 câu trắc nghiệm theo tình huống. Đạt khi đúng từ 7/10. ${best!=null?`Điểm gần nhất của bạn: <b class="mono">${best}/10</b>.`:""}</p></header>
+  <form id="quiz" class="section" data-n="${n}">
+  ${T.q.map((q,i) => `<fieldset class="card q" style="border:1px solid var(--line)"><legend class="stem" style="padding:0 4px">Câu ${i+1}. ${esc(q[0])}</legend><div class="opts">${q[1].map((o,j) => `<label class="opt" id="o-${i}-${j}"><input type="radio" name="q${i}" value="${j}"><span class="k">${"ABCD"[j]}</span><span>${esc(o)}</span></label>`).join("")}</div><div class="explain" id="x-${i}" hidden></div></fieldset>`).join("")}
+  <div class="card"><div class="score" id="score"><span class="lead" id="answered">Đã chọn 0/10 câu</span></div><div class="row"><button type="submit" class="btn" id="submit">Nộp bài và chấm</button><button type="button" class="btn ghost" id="reset">Làm lại</button></div></div>
+  </form>`;
+}
+function bindQuiz() {
+  const f = $("#quiz"); if (!f) return;
+  const n = f.dataset.n, T = TESTS[n];
+  const count = () => { const c = T.q.filter((_,i) => f.querySelector(`input[name=q${i}]:checked`)).length; $("#answered").textContent = `Đã chọn ${c}/10 câu`; };
+  f.addEventListener("change", count);
+  f.addEventListener("submit", e => {
+    e.preventDefault();
+    let sc = 0;
+    T.q.forEach((q,i) => {
+      const pick = f.querySelector(`input[name=q${i}]:checked`);
+      const v = pick ? +pick.value : -1;
+      q[1].forEach((_,j) => { const el = $(`#o-${i}-${j}`); el.classList.remove("correct","wrong"); if (j===q[2]) el.classList.add("correct"); else if (j===v) el.classList.add("wrong"); });
+      if (v === q[2]) sc++;
+      const x = $(`#x-${i}`); x.hidden = false;
+      x.innerHTML = `<b>${v===q[2]?"Đúng.":(v<0?"Chưa trả lời.":"Chưa đúng.")}</b> Đáp án ${"ABCD"[q[2]]}. ${esc(q[3])}`;
+    });
+    P.t[n] = sc; save(); renderNav("test-"+n);
+    const pass = sc >= 7;
+    $("#score").innerHTML = `<span class="big">${sc}/10</span><span class="verdict ${pass?"pass":"fail"}">${pass?"Đạt":"Chưa đạt"}</span><span class="lead">${pass?"Tốt lắm. Xem lại giải thích các câu sai rồi học tiếp.":"Đọc lại phần Ý cốt lõi của module rồi làm lại nhé."}</span>`;
+    $("#score").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"center"});
+  });
+  $("#reset").addEventListener("click", () => { route(); window.scrollTo(0,0); });
+}
+
+function pageTemplates() {
+  return `<header class="head"><div class="eyebrow">CÔNG CỤ</div><h1>Biểu mẫu dự án</h1><p class="lead">10 mẫu dùng được ngay cho dự án thật. Nút “Sao chép” copy bảng dưới dạng có thể dán thẳng vào Excel hoặc Google Sheets.</p></header>
+  ${TEMPLATES.map(t => `<section class="section" id="tpl-${t.id}"><div class="row" style="justify-content:space-between"><h2>${esc(t.t)}</h2><button class="btn ghost" data-copy="${t.id}">Sao chép</button></div><p class="lead" style="font-size:.92rem">${esc(t.note)}</p><div class="tablewrap"><table><thead><tr>${t.h.map(h=>`<th>${esc(h)}</th>`).join("")}</tr></thead><tbody>${t.r.map(r=>`<tr>${r.map(c=>`<td>${esc(c)||"&nbsp;"}</td>`).join("")}</tr>`).join("")}</tbody></table></div></section>`).join("")}`;
+}
+
+function pageGlossary() {
+  return `<header class="head"><div class="eyebrow">CÔNG CỤ</div><h1>Thuật ngữ song ngữ</h1><p class="lead">Những từ xuất hiện hằng ngày trong dự án CNTT ở Việt Nam, thường được nói bằng tiếng Anh.</p></header>
+  <label for="gq" class="lead" style="font-size:.85rem">Tìm thuật ngữ</label><input id="gq" class="search" type="search" placeholder="Ví dụ: velocity, rủi ro, WBS">
+  <div class="tablewrap"><table><thead><tr><th>Tiếng Anh</th><th>Tiếng Việt</th><th>Hiểu nhanh</th></tr></thead><tbody id="gbody">${GLOSSARY.map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(g[1])}</td><td>${esc(g[2])}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+/* ===================== PDF BÀI GIẢNG ===================== */
+const PDF_IDS = Array.from({length:SESSIONS.length}, (_, i) => "QLDA-CNTT_Buoi-" + String(i+1).padStart(2,"0") + ".pdf");
+const PDF_FULL = "QLDA-CNTT_Giao-trinh-toan-khoa.pdf";
+const pdfUrl = id => "pdf/" + id;
+function pdfCard(id, filename, title, sub) {
+  return `<section class="card pdfcard"><div class="row" style="justify-content:space-between;align-items:center">
+    <div class="row" style="gap:12px"><span class="pdficon" aria-hidden="true">PDF</span><div><b>${esc(title)}</b><br><span class="lead" style="font-size:.85rem">${esc(sub)}</span></div></div>
+    <div class="row"><a class="btn" href="${pdfUrl(id)}" download="${esc(filename)}" style="text-decoration:none">Tải PDF</a><a class="btn ghost" href="${pdfUrl(id)}" target="_blank" rel="noopener" style="text-decoration:none">Mở xem</a></div>
+  </div></section>`;
+}
+async function savePdf(btn) { const a = document.createElement("a"); a.href = pdfUrl(btn.dataset.pdf); a.download = btn.dataset.name; document.body.appendChild(a); a.click(); a.remove(); }
+
+function pageLesson(n) {
+  const s = SESSIONS.find(x => x[0] === n);
+  const L = (window.LESSONS || {})[n];
+  const m = MODULES.find(x => x.id === s[1]);
+  const prev = n > 1 ? SESSIONS[n-2] : null, next = n < SESSIONS.length ? SESSIONS[n] : null;
+  if (!L) return `<header class="head"><h1>Buổi ${n}</h1><p class="lead">Chưa tải được nội dung bài giảng. Hãy tải lại trang.</p></header>`;
+  const done = !!P.s[n];
+  const ss = sessionsOf(m.id);
+  const fname = `QLDA-CNTT_Buoi-${String(n).padStart(2,"0")}.pdf`;
+  return `<header class="lesson-hero">
+    <div class="eyebrow"><a href="#m${m.id}">Module ${m.id} · ${esc(m.title.split(":")[0])}</a></div>
+    <h1>${esc(s[3])}</h1>
+    <div class="chips"><span class="chip">Buổi ${n}/${SESSIONS.length}</span><span class="chip">Tuần ${s[2]}</span><span class="chip">150 phút</span>${done ? `<span class="chip ok">✓ Đã học xong</span>` : ""}</div>
+    <div class="steps" aria-label="Các buổi trong module">${ss.map(x => `<a class="step ${P.s[x[0]] ? "done" : ""} ${x[0] === n ? "cur" : ""}" href="#b${x[0]}" title="Buổi ${x[0]}: ${esc(x[3])}"><i>${P.s[x[0]] && x[0] !== n ? "✓" : x[0]}</i></a>`).join("")}<span class="steps-label">Module ${m.id}: ${ss.filter(x => P.s[x[0]]).length}/${ss.length} buổi</span></div>
+  </header>
+  <div class="pdf-inline">${pdfCard(PDF_IDS[n-1], fname, `Bài giảng Buổi ${n} (PDF)`, "Bản in A4, 2–3 trang, có sẵn đáp án phần tự kiểm tra")}</div>
+  <section class="overview" data-toc="Tổng quan buổi học">
+    <div class="card"><h3>Mục tiêu buổi học</h3><p class="lead" style="font-size:.88rem">Học xong buổi này, bạn có thể:</p><ul class="goals">${L.goals.map(g=>`<li><span>${esc(g)}</span></li>`).join("")}</ul></div>
+    <div class="card"><h3>Lịch buổi học · 150 phút</h3><ol class="timeline">${L.agenda.map(a=>`<li><span class="t">${esc(a[0])}′</span><span>${esc(a[1])}</span></li>`).join("")}</ol></div>
+  </section>
+  ${L.parts.map((p, i) => { const t = p.h.replace(/^\d+\.\s*/, ""); return `<section class="lesson-part"><h2 data-toc-label="${esc(t)}"><span class="pnum">${String(i+1).padStart(2,"0")}</span><span>${esc(t)}</span></h2>${p.html}</section>`; }).join("")}
+  <section class="card activity" data-toc="Thực hành trong buổi"><div class="eyebrow">Thực hành trong buổi</div><h3>${esc(L.activity.t)}</h3>${L.activity.html}</section>
+  <section class="section"><h2>Tự kiểm tra</h2><p class="lead" style="font-size:.92rem">Tự trả lời trước, rồi mới bấm để xem đáp án.</p>
+    ${L.check.map((c,i)=>`<details class="case"><summary><span>${i+1}. ${esc(c[0])}</span><span class="pill">Xem đáp án</span></summary><div class="body"><div class="hint">${esc(c[1])}</div></div></details>`).join("")}
+  </section>
+  <section class="card homework" data-toc="Bài về nhà"><div class="eyebrow">Bài về nhà</div><p>${esc(L.home)}</p>
+    <div class="row"><button class="btn js-done ${done ? "is-done" : ""}" data-n="${n}">${done ? "✓ Đã học xong buổi này" : "Đánh dấu đã học xong"}</button><a class="btn ghost" href="#bai-tap">Xem bài tập</a></div></section>
+  <section class="section"><h2>Hỏi đáp & thảo luận</h2><p class="lead" style="font-size:.92rem">Thắc mắc về bài này? Hỏi ở đây, cả cộng đồng cùng trả lời.</p><div id="discuss" data-key="b${n}"></div></section>
+  <nav class="pcards" aria-label="Chuyển buổi">
+    ${prev ? `<a class="pc prev" href="#b${prev[0]}"><span>← Buổi ${prev[0]}</span><b>${esc(prev[3])}</b></a>` : `<span class="pc empty"></span>`}
+    ${next ? `<a class="pc next" href="#b${next[0]}"><span>Buổi ${next[0]} →</span><b>${esc(next[3])}</b></a>` : `<a class="pc next" href="#capstone"><span>Tiếp theo →</span><b>Capstone: Cứu dự án FreshGo</b></a>`}
+  </nav>`;
+}
+
+/* ===================== ROUTER ===================== */
+function route() {
+  const h = (location.hash || "#home").slice(1);
+  let html, active = h;
+  if (h === "lo-trinh") html = pageRoadmap();
+  else if (/^m[1-7]$/.test(h)) html = pageModule(+h[1]);
+  else if (/^b([1-9]|1[0-9]|2[0-6])$/.test(h)) { const n = +h.slice(1); html = pageLesson(n); active = "m" + SESSIONS[n-1][1]; }
+  else if (h === "bai-tap") html = pageExercises();
+  else if (h === "tinh-huong") html = pageCases();
+  else if (h === "capstone") html = pageCapstone();
+  else if (/^test-[1-4]$/.test(h)) html = pageTest(h.slice(5));
+  else if (h === "bieu-mau") html = pageTemplates();
+  else if (h === "thuat-ngu") html = pageGlossary();
+  else if (h === "dap-an") html = pageAnswerHub();
+  else if (/^dap-an-[1-7]$/.test(h)) { html = pageAnswerModule(+h.slice(7)); active = "dap-an"; }
+  else if (h === "dap-an-capstone") html = pageCapstoneAnswer();
+  else if (h === "phong-van") html = pageInterview();
+  else if (h === "ho-so") html = pageCareer();
+  else if (h === "cheat-sheet") html = pageCheat();
+  else { html = pageHome(); active = "home"; }
+  $("#view").innerHTML = html;
+  renderNav(active);
+  renderChrome(h);
+  if (window.Platform) { if (!accMounted) { Platform.mountAccount(ACC); accMounted = true; } const d = $("#discuss"); if (d) Platform.mountComments(d, COURSE_SLUG, d.dataset.key); }
+  if ($("#pert")) { calcPert(); $("#pert").addEventListener("input", calcPert); }
+  if ($("#evm")) { calcEvm(); $("#evm").addEventListener("input", calcEvm); }
+  bindQuiz();
+  const gq = $("#gq");
+  if (gq) gq.addEventListener("input", () => { const q = gq.value.trim().toLowerCase(); $("#gbody").innerHTML = GLOSSARY.filter(g => g.join(" ").toLowerCase().includes(q)).map(g=>`<tr><td><b>${esc(g[0])}</b></td><td>${esc(g[1])}</td><td>${esc(g[2])}</td></tr>`).join("") || `<tr><td colspan="3">Không tìm thấy “${esc(gq.value)}”. Thử từ khác.</td></tr>`; });
+}
+
+document.addEventListener("change", e => {
+  const t = e.target;
+  if (t.dataset && t.dataset.s) { P.s[t.dataset.s] = t.checked; save(); t.closest(".check").classList.toggle("is-done", t.checked); renderNav((location.hash||"#home").slice(1)); renderTop((location.hash||"#home").slice(1)); }
+  if (t.dataset && t.dataset.e) { P.e[t.dataset.e] = t.checked; save(); t.closest(".check").classList.toggle("is-done", t.checked); }
+});
+document.addEventListener("click", async e => {
+  const pb = e.target.closest("[data-pdf]");
+  if (pb) { savePdf(pb); return; }
+  const md = e.target.closest(".js-done");
+  if (md) { const n = md.dataset.n; P.s[n] = !P.s[n]; save();
+    document.querySelectorAll(".js-done").forEach(b => { b.classList.toggle("is-done", !!P.s[n]); b.textContent = P.s[n] ? (b.closest(".rail") ? "✓ Đã học xong" : "✓ Đã học xong buổi này") : "Đánh dấu đã học xong"; });
+    const h = (location.hash||"#home").slice(1); renderNav(h); renderTop(h);
+    toast(P.s[n] ? "Đã lưu: xong buổi " + n : "Đã bỏ đánh dấu buổi " + n); return; }
+  const b = e.target.closest("[data-copy]"); if (!b) return;
+  const t = TEMPLATES.find(x => x.id === b.dataset.copy);
+  const tsv = [t.h, ...t.r].map(r => r.join("\t")).join("\n");
+  try { await navigator.clipboard.writeText(tsv); toast("Đã sao chép " + t.t.split("·")[1].trim()); }
+  catch (err) { toast("Trình duyệt chặn sao chép. Hãy bôi đen bảng rồi Ctrl+C."); }
+});
+/* ===================== KHUNG GIAO DIỆN: thanh trên, cột phải, chế độ ===================== */
+const PAGE_LABEL = { "home":"Tổng quan", "lo-trinh":"Lộ trình 26 buổi", "bai-tap":"Bài tập", "tinh-huong":"6 tình huống", "capstone":"Capstone", "test-1":"Test 1", "test-2":"Test 2", "test-3":"Test 3", "test-4":"Test 4", "bieu-mau":"Biểu mẫu", "thuat-ngu":"Thuật ngữ", "dap-an":"Đáp án bài tập", "dap-an-capstone":"Đáp án Capstone", "cheat-sheet":"Cheat sheet", "phong-van":"Phỏng vấn", "ho-so":"CV & Portfolio" };
+const PREF_KEY = "qlda-ui-v1";
+let UI = { theme: null, focus: false, noside: false };
+try { UI = Object.assign(UI, JSON.parse(localStorage.getItem(PREF_KEY) || "{}")); } catch (e) {}
+function saveUI() { try { localStorage.setItem(PREF_KEY, JSON.stringify(UI)); } catch (e) {} }
+const isNarrow = () => matchMedia("(max-width: 1023px)").matches;
+function applyUI() {
+  const root = document.documentElement;
+  if (UI.theme) root.setAttribute("data-theme", UI.theme); else root.removeAttribute("data-theme");
+  const sh = $("#shell");
+  sh.classList.toggle("focus", !!UI.focus);
+  sh.classList.toggle("noside", !!UI.noside && !isNarrow());
+  $("#tg-focus").setAttribute("aria-pressed", String(!!UI.focus));
+}
+function currentTheme() { return UI.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); }
+
+function renderTop(h) {
+  const o = overall(), pct = Math.round((o.sd + o.ed) / (o.st + o.et) * 100);
+  let crumbs = `<a href="#home" class="hide-sm">Quản lý dự án CNTT</a>`;
+  const n = currentLesson();
+  if (n) { const s = SESSIONS[n-1]; crumbs += `<span class="sep hide-sm">/</span><a href="#m${s[1]}" class="hide-sm">Module ${s[1]}</a><span class="sep">/</span><b>Buổi ${n}: ${esc(s[3])}</b>`; }
+  else if (/^m[1-7]$/.test(h)) { const m = MODULES.find(x => x.id === +h[1]); crumbs += `<span class="sep hide-sm">/</span><b>Module ${m.id}: ${esc(m.title.split(":")[0])}</b>`; }
+  else if (/^dap-an-[1-7]$/.test(h)) crumbs += `<span class="sep hide-sm">/</span><a href="#dap-an" class="hide-sm">Đáp án</a><span class="sep">/</span><b>Module ${h.slice(7)}</b>`;
+  else crumbs += `<span class="sep hide-sm">/</span><b>${esc(PAGE_LABEL[h] || "Tổng quan")}</b>`;
+  $("#crumbs").innerHTML = crumbs;
+  $("#cprog").innerHTML = `<span class="ring" style="--p:${pct}" aria-hidden="true"></span><span><b>${pct}%</b> <span class="txt">hoàn thành</span></span>`;
+  $("#cprog").title = `${o.sd}/${o.st} buổi · ${o.ed}/${o.et} bài tập · ${o.tp}/${o.tt} test đạt`;
+}
+
+let tocObserver = null;
+function renderRail(h) {
+  const view = $("#view");
+  const heads = [...view.querySelectorAll("h2, [data-toc]")].filter(el => !el.closest("details") && !el.closest(".card:not([data-toc])"));
+  heads.forEach((el, i) => { if (!el.id) el.id = "sec-" + i; });
+  const label = el => el.dataset.toc || el.dataset.tocLabel || el.textContent.trim();
+  const n = currentLesson();
+  let tools = "";
+  if (n) {
+    const s = SESSIONS[n-1], done = !!P.s[n], fname = `QLDA-CNTT_Buoi-${String(n).padStart(2,"0")}.pdf`;
+    tools = `<div class="rail-box"><div class="rail-title">Buổi ${n} / ${SESSIONS.length}</div><div class="tool">
+      <button class="btn js-done ${done ? "is-done" : ""}" data-n="${n}">${done ? "✓ Đã học xong" : "Đánh dấu đã học xong"}</button>
+      <div class="two"><button class="btn ghost" data-pdf="${PDF_IDS[n-1]}" data-name="${fname}">Tải PDF</button><a class="btn ghost" href="${pdfUrl(PDF_IDS[n-1])}" target="_blank" rel="noopener">Mở PDF</a></div>
+      <div class="two">${n > 1 ? `<a class="btn ghost" href="#b${n-1}" title="Phím ←">← Trước</a>` : `<span></span>`}${n < SESSIONS.length ? `<a class="btn ghost" href="#b${n+1}" title="Phím →">Sau →</a>` : `<a class="btn ghost" href="#capstone">Capstone</a>`}</div>
+    </div></div>`;
+  }
+  if (!n) {
+    const nx = SESSIONS.find(s => !P.s[s[0]]);
+    tools = nx ? `<div class="rail-box"><div class="rail-title">Học tiếp</div><div class="tool"><span style="font-size:.86rem;line-height:1.4"><b>Buổi ${nx[0]}:</b> ${esc(nx[3])}</span><a class="btn" href="#b${nx[0]}">Vào học →</a></div></div>` : "";
+  }
+  const toc = heads.length >= 2 ? `<div class="rail-box"><div class="rail-title">Trong trang này</div><nav class="toc">${heads.map(el => `<button data-goto="${el.id}">${esc(label(el))}</button>`).join("")}</nav></div>` : "";
+  const keys = `<div class="rail-box kbd"><div class="rail-title">Phím tắt</div><span><kbd>←</kbd> <kbd>→</kbd> chuyển buổi học</span><span><kbd>F</kbd> chế độ tập trung</span><span><kbd>[</kbd> ẩn/hiện mục lục</span><span><kbd>Ctrl K</kbd> tìm kiếm</span></div>`;
+  $("#rail").innerHTML = tools + toc + keys;
+  if (tocObserver) tocObserver.disconnect();
+  if (heads.length >= 2 && "IntersectionObserver" in window) {
+    tocObserver = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) { $("#rail").querySelectorAll(".toc button").forEach(b => b.classList.toggle("on", b.dataset.goto === en.target.id)); } });
+    }, { rootMargin: "-80px 0px -70% 0px" });
+    heads.forEach(el => tocObserver.observe(el));
+  }
+}
+
+function renderChrome(h) {
+  renderTop(h);
+  renderRail(h);
+  if (typeof ACC !== "undefined" && ACC && !ACC.isConnected) $("#account-top").appendChild(ACC);
+  $("#shell").classList.remove("side-open");
+  const nav = $("#nav"), cur = $("#nav .ses.cur, #nav .nv.active");
+  if (cur && !isNarrow()) { const r = cur.getBoundingClientRect(), nr = nav.getBoundingClientRect(); if (r.top < nr.top || r.bottom > nr.bottom) nav.scrollTop += r.top - nr.top - nr.height / 3; }
+}
+
+/* Sự kiện giao diện */
+document.addEventListener("click", e => {
+  const tm = e.target.closest("[data-tmod]");
+  if (tm) { const id = +tm.dataset.tmod; OPEN_MODS.has(id) ? OPEN_MODS.delete(id) : OPEN_MODS.add(id); const mod = tm.closest(".mod"); mod.classList.toggle("open"); tm.setAttribute("aria-expanded", String(mod.classList.contains("open"))); return; }
+  const st = e.target.closest("[data-stab]");
+  if (st) { SIDE_TAB.tab = st.dataset.stab; const h = (location.hash || "#home").slice(1); SIDE_TAB.route = h; renderNav(h); $("#nav").scrollTop = 0; return; }
+  const go = e.target.closest("[data-goto]");
+  if (go) { const el = document.getElementById(go.dataset.goto); if (el) el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); return; }
+  if (e.target.closest("#tg-side")) { if (isNarrow()) $("#shell").classList.toggle("side-open"); else { UI.noside = !UI.noside; if (UI.noside) UI.focus = false; saveUI(); applyUI(); } return; }
+  if (e.target.closest("#tg-focus")) { UI.focus = !UI.focus; saveUI(); applyUI(); toast(UI.focus ? "Chế độ tập trung: bật (phím F để tắt)" : "Chế độ tập trung: tắt"); return; }
+  if (e.target.closest("#tg-theme")) { UI.theme = currentTheme() === "dark" ? "light" : "dark"; saveUI(); applyUI(); return; }
+  if (e.target.closest("#scrim")) { $("#shell").classList.remove("side-open"); return; }
+});
+document.addEventListener("keydown", e => {
+  const t = e.target;
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+  const n = currentLesson();
+  if (e.key === "ArrowRight" && n) { location.hash = n < SESSIONS.length ? "#b" + (n + 1) : "#capstone"; }
+  else if (e.key === "ArrowLeft" && n && n > 1) { location.hash = "#b" + (n - 1); }
+  else if (e.key === "f" || e.key === "F") { UI.focus = !UI.focus; saveUI(); applyUI(); }
+  else if (e.key === "[") { if (isNarrow()) $("#shell").classList.toggle("side-open"); else { UI.noside = !UI.noside; saveUI(); applyUI(); } }
+  else if (e.key === "Escape") { $("#shell").classList.remove("side-open"); if (UI.focus) { UI.focus = false; saveUI(); applyUI(); } }
+});
+matchMedia("(max-width: 1023px)").addEventListener("change", applyUI);
+applyUI();
+
+/* ===================== TÌM KIẾM (Ctrl K hoặc /) ===================== */
+let SINDEX = null, sHits = [], sSel = 0;
+const strip = h => String(h).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+const fold = t => String(t).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d");
+function buildIndex() {
+  const ix = [];
+  Object.entries(PAGE_LABEL).forEach(([h, l]) => ix.push({ h, kind: "Trang", title: l, text: "" }));
+  MODULES.forEach(m => ix.push({ h: "m" + m.id, kind: "Module " + m.id, title: m.title, text: strip(m.lead + " " + m.core.join(" ")) }));
+  SESSIONS.forEach(s => {
+    const L = (window.LESSONS || {})[s[0]];
+    ix.push({ h: "b" + s[0], kind: "Buổi " + s[0], title: s[3], text: L ? strip(L.goals.join(" ") + " " + L.parts.map(p => p.h + " " + p.html).join(" ")) : "" });
+    if (L) L.parts.forEach(p => ix.push({ h: "b" + s[0], kind: "Buổi " + s[0] + " · mục", title: p.h.replace(/^\d+\.\s*/, ""), text: strip(p.html) }));
+  });
+  (typeof GLOSSARY !== "undefined" ? GLOSSARY : []).forEach(g => ix.push({ h: "thuat-ngu", kind: "Thuật ngữ", title: g[0] + " — " + g[1], text: g[2] }));
+  (typeof TEMPLATES !== "undefined" ? TEMPLATES : []).forEach(t => ix.push({ h: "bieu-mau", kind: "Biểu mẫu", title: t.t, text: t.note }));
+  ix.forEach(x => { x.ft = fold(x.title); x.fx = fold(x.text); });
+  return ix;
+}
+function searchRun(q) {
+  const terms = fold(q).split(/\s+/).filter(Boolean);
+  if (!terms.length) { sHits = SESSIONS.filter(s => !P.s[s[0]]).slice(0, 6).map(s => ({ h: "b" + s[0], kind: "Gợi ý · Buổi " + s[0], title: s[3] })); }
+  else {
+    sHits = SINDEX.map(x => {
+      let sc = 0;
+      for (const t of terms) { if (x.ft.includes(t)) sc += 10; else if (x.fx.includes(t)) sc += 2; else return null; }
+      if (x.ft.startsWith(terms[0])) sc += 5;
+      return { x, sc };
+    }).filter(Boolean).sort((a, b) => b.sc - a.sc).slice(0, 30).map(r => r.x);
+  }
+  sSel = 0; drawHits(q);
+}
+function drawHits(q) {
+  const box = $("#sres");
+  box.innerHTML = sHits.length ? sHits.map((x, i) => `<a class="shit ${i === sSel ? "sel" : ""}" href="#${x.h}" data-i="${i}"><small>${esc(x.kind)}</small><span>${esc(x.title)}</span></a>`).join("") : `<div class="sempty">Không tìm thấy “${esc(q)}”. Thử từ khác, ví dụ: rủi ro, EVM, user story.</div>`;
+  const sel = box.querySelector(".sel"); if (sel) sel.scrollIntoView({ block: "nearest" });
+}
+function openSearch() {
+  if (!SINDEX) SINDEX = buildIndex();
+  $("#sbox").classList.add("open"); const i = $("#sinput"); i.value = ""; searchRun(""); setTimeout(() => i.focus(), 10);
+}
+function closeSearch() { $("#sbox").classList.remove("open"); }
+document.addEventListener("click", e => {
+  if (e.target.closest("#tg-search")) { openSearch(); return; }
+  if (e.target.id === "sbox") { closeSearch(); return; }
+  if (e.target.closest(".shit")) { closeSearch(); }
+});
+document.addEventListener("keydown", e => {
+  const open = $("#sbox").classList.contains("open");
+  if ((e.key === "k" || e.key === "K") && (e.ctrlKey || e.metaKey)) { e.preventDefault(); open ? closeSearch() : openSearch(); return; }
+  if (!open && e.key === "/" && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && !e.target.isContentEditable) { e.preventDefault(); openSearch(); return; }
+  if (!open) return;
+  if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closeSearch(); }
+  else if (e.key === "ArrowDown") { e.preventDefault(); sSel = Math.min(sSel + 1, sHits.length - 1); drawHits($("#sinput").value); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); sSel = Math.max(sSel - 1, 0); drawHits($("#sinput").value); }
+  else if (e.key === "Enter" && sHits[sSel]) { e.preventDefault(); location.hash = "#" + sHits[sSel].h; closeSearch(); }
+}, true);
+document.addEventListener("input", e => { if (e.target.id === "sinput") searchRun(e.target.value); });
+
+if ('../../index.html') { const lg = $("#logo"); lg.href = '../../index.html'; lg.title = "Tất cả khóa học"; }
+window.addEventListener("hashchange", () => { route(); window.scrollTo(0,0); $("#view").focus({preventScroll:true}); });
+route();
+if (window.Platform) {
+  const sync = async () => { const r = await Platform.loadProgress(COURSE_SLUG); if (Platform.user) { mergeProgress(r); save(); route(); } };
+  Platform.ready.then(sync); Platform.onAuthChange(sync);
+}
+</script>
+</body>
+</html>
